@@ -1,3 +1,47 @@
-label {
+.unselectable {
     user-select: none;
+}
+
+.my-draggable {
+    cursor: pointer;
+    width: 200px;
+    height: 50px;
+    border: 1px solid #000000;
+    background-color: khaki;
+    border-radius: 5px;
+    font-family: 'Arial';
+}
+.my-father {
+    position: absolute;
+    top: -7px;
+    left: 85px;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    background-color: cornflowerblue;
+    border-radius: 10px;
+    border: 1px solid #000000;
+}
+
+.my-mother {
+    position: absolute;
+    top: -7px;
+    left: 105px;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    background-color: crimson;
+    border-radius: 10px;
+    border: 1px solid #000000;
+}
+.my-child {
+    position: absolute;
+    top: 43px;
+    left: 95px;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    background-color: dimgray;
+    border-radius: 10px;
+    border: 1px solid #000000;
 }

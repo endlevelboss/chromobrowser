@@ -1,5 +1,6 @@
 var kits = []; // Contains chromobrowser match data
 var kitRawdata = []; // Contains raw autosomal
+var userdata = []; // Contains all user data
 
 
 function getKit(name) {
@@ -63,6 +64,7 @@ function onStartup() {
             res.continue();
         } else {
             loadLocalstorage();
+            initializeUserdata();
             var transaction = db.transaction(["raw"], "readonly");
             var storeRaw = transaction.objectStore('raw');
             var cursorRaw = storeRaw.openCursor();
@@ -80,14 +82,19 @@ function onStartup() {
     }
 }
 
+window.onbeforeunload = function (e) {
+    saveLocalstorage();
+}
+
 function loadLocalstorage() {
     var chromobrowserdata = localStorage.chromobrowser;
     if (chromobrowserdata != undefined) {
-        var cbdata = JSON.parse(chromobrowserdata);
-        matches = cbdata[0];
-        var relationtreedata = getCustom('relationtree','chromobrowserglobalcustom');
-        if (relationtreedata != null) {
-            personBoxes = relationtreedata;
-        }
+        //console.log(chromobrowserdata);
+        userdata = JSON.parse(chromobrowserdata);
+        //console.log(userdata);
     }
+}
+
+function saveLocalstorage() {
+    localStorage.chromobrowser = JSON.stringify(userdata);
 }

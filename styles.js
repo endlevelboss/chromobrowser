@@ -37,7 +37,7 @@ var styles = {
         position: 'absolute',
         top: '10px',
         left: '10px',
-        backgroundColor: '#666666',
+        backgroundColor: 'red',
         height: '100px',
         width: '100px',
         border: '1px solid black',
@@ -50,21 +50,33 @@ var styles = {
     displayselect: {
         position: 'fixed',
         top: '0px',
-        left: '300px',
+        left: '450px',
     },
     matchinfo: {
         position: 'absolute',
         top: '600px',
         left: '20px',
+        fontFamily: '"Arial"',
+    },
+    mydraggable: {
+        //cursor: 'pointer',
+        width: '200px',
+        height: '50px',
+        border: '1px solid black',
+        borderRadius: '5px',
+        fontFamily: '"Arial"',
     },
 }
 
-function matchstyle(xpos, ypos, rectHeight, rectWidth) {
+function matchstyle(xpos, ypos, rectHeight, rectWidth, color) {
+    var mycolor = color;
+    if (color == null)
+        mycolor = 'khaki';
     var matchblockStyle = {
             position: 'absolute',
             top: ypos,
             left: xpos,
-            backgroundColor: '#FFBF5E',
+            backgroundColor: mycolor,
             height: rectHeight,
             width: rectWidth,
             border: '1px solid black',

@@ -10,15 +10,11 @@ var DataHandler = React.createClass({
     handleChange: function(e) {
         if(e.target != null) {
             this.setState({selection: getKit(e.target.value).matches});
-//            console.log(this.state.selection);
         }
     },
     clickMatch: function(e) {
-//        console.log(e.target.innerHTML);
         var mydata = getData(this.state.selection, e.target.innerHTML);
         this.setState({matchselection: mydata});
-//        console.log(mydata);
-        
     },
     render: function() {
         return(
@@ -69,7 +65,6 @@ var MatchesList = React.createClass({
                 return <a key={match.name} onClick={this.props.click}>{match.name}<br/></a>;
             }.bind(this));
         }
-//        console.log(this.props.matches);
         return (
             <div>{mymatches}</div>
         );
@@ -122,7 +117,6 @@ function getData(kit, matchname) {
 }
 
 function checkData(mymatch, dataarray) {
-//    console.log(mymatch);
     for (var i = 0; i < mymatch.matchblocks.length; i++) {
         if (mymatch.matchblocks[i].chromo == dataarray[0] && mymatch.matchblocks[i].start == dataarray[1]) {
             return null;
