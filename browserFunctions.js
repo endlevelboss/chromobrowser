@@ -69,6 +69,17 @@ function findNames(owner){
     return matchnames;
 }
 
+function compareKitsInCommon(person, selectionList, useInCommon) {
+    var inCommonList = [];
+    if (selectionList.length > 0 && selectionList[0] != null) {
+            inCommonList = selectionList.map( function(data) {
+                return data.name;
+                       });
+    }
+    var result = testInCommon(person, inCommonList, useInCommon);
+    return result;
+}
+
 function testInCommon(person, inCommonList, useInCommon) {
     var isInCommon = [];
     for (var i in person) {
@@ -150,4 +161,129 @@ function getRelationColor(matchname) {
         }
     }
     return null;
+}
+
+
+function simpleRawSort(rawA, rawB) {
+    var ordered = [];
+    var cont = true;
+    var a = rawA.shift();
+    //console.log(Number(a[2]));
+    var b = rawB.shift();
+    while (cont) {
+        if (a == undefined || b == undefined) {
+            cont = false;
+        } else if (Number(a[2]) == Number(b[2])) {
+            ordered[ordered.length] = [a[3], b[3], a[2]];
+            a = rawA.shift();
+            b = rawB.shift();
+        } else if (Number(a[2]) > Number(b[2])) {
+            //console.log( a.position + ' > ' + b.position );
+            b = rawB.shift();
+        } else {
+            //console.log(a.position + ' < ' + b.position );
+            a = rawA.shift();
+        }
+    }
+    //console.log(ordered);
+    return ordered;
+}
+
+function compareRaw(rawA, rawB) {
+    var raw = simpleRawSort(rawA, rawB);
+    //console.log(raw[0]);
+    
+    var comparison = [];
+    var compared = null;
+    for (var i = 0; i < raw.length; i++) {
+        var geneA = raw[i][0].split();
+        var geneB = raw[i][1].split();
+        compared = {
+            color: 'red',
+            position: raw[i][2]
+        };
+        if (geneA[0] == geneB[0]) {
+            if (geneA[1] == geneB[1]) {
+                compared.color = 'green';
+            } else {
+                compared.color = 'yellow';
+            }
+        } else if (geneA[0] == geneB[1]) {
+            if (geneA[1] == geneB[0]) {
+                compared.color = 'green';
+            } else {
+                compared.color = 'yellow';
+            }
+        } else if (geneA[1] == geneB[0] || geneA[1] == geneB[1]) {
+            compared.color = 'yellow';
+        }
+        comparison[comparison.length] = compared;
+    }
+    return comparison;
+}
+
+function sortRawdata(selectedPerson, selectedChromosome) {
+    //console.log(kitRawdata);
+    var myraw = [];
+    for (var j = 0; j < kitRawdata.length; j++) {
+        if(kitRawdata[j].name == selectedPerson) {
+            myraw = kitRawdata[j].data;
+        }
+    }
+    var mydata = [];
+    for (var i = 0; i < myraw.length; i++) {
+        if (myraw[i][1] == selectedChromosome) {
+            mydata[mydata.length] = myraw[i];
+        }
+    }
+    return mydata;
+}
+
+function compareRawdata(selectedA, selectedB, selectedChromosome) {
+    var compared =[];
+    if (selectedA != null || selectedB != null) {
+        var rawA = sortRawdata(selectedA.name, selectedChromosome);
+        var rawB = sortRawdata(selectedB.name, selectedChromosome);
+        //console.log(rawA);
+        if (rawA.length != 0 && rawB.length != 0) {
+            compared = compareRaw(rawA, rawB);
+        }
+    }
+    return compared;
+}
+
+function drawRaw(){
+    
+    
+    // alert('tegner raw');
+    var canvas = document.getElementById("chromobrowser");
+    var context = canvas.getContext("2d");
+    var scale = (canvas.width - 50) / chromolength[chromosomeIndex];
+    var drawHeight = canvas.height - 50;
+    var rowheight = (drawHeight - 6 * (numOfRows - 1)) / numOfRows;
+
+    var ypos = 25 + rowheight * afterRowNumber + 6 *(afterRowNumber - 1) ;
+
+    context.fillStyle = 'red';
+    context.fillRect(25, ypos, canvas.width - 50, 6);
+    context.fillStyle = 'yellow';
+    for (var j = 0; j < blockdata.length; j++){
+        var xpos = blockdata[j].start * scale + 25;
+        var rectWidth = (blockdata[j].end - blockdata[j].start) * scale;
+        context.fillRect(xpos, ypos, rectWidth, 6);
+    }
+    console.log(data.length);
+    if (data.length > 0) {
+        context.fillStyle = 'lightGrey';
+        context.fillRect(25, ypos, canvas.width - 50, 3);
+    }
+
+    for (var i=0; i<data.length; i++) {
+        //alert('iter:' + i + ' ' + data[i].color + ' ' + data[i].position);
+        context.fillStyle = data[i].color;
+        var xpos = data[i].position * scale + 25;
+        context.fillRect(xpos, ypos, 1, 3);
+    }
+
+    
 }

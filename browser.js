@@ -92,11 +92,11 @@ var BrowserHandler = React.createClass({
             <ChromoSelector  onChange={this.selectedChromosome} />
             <form style={styles.displayselect} onChange={this.selectDisplay}>
                 <select>
-                    <option value='A'>Vis en</option>
-                    <option value='B'>Sammenlign to, felles</option>
-                    <option value='C'>Sammenlign to</option>
-                    <option value='D'>Sammenlign tre, felles</option>
-                    <option value='E'>Sammenlign fire, felles</option>
+                    <option value='A'>Single kit</option>
+                    <option value='B'>Compare two kits, in common</option>
+                    <option value='C'>Compare two kits</option>
+                    <option value='D'>Compare three kits, in common</option>
+                    <option value='E'>Compare four kits, in common</option>
                 </select>
             </form>
             <DisplaySelection deselect={this.onClick} click={this.clickMatchblock} kits={this.props.kits} selection={this.state.selection} chromosome={this.state.chromosome} chromoindex={this.state.chromoIndex} displaymode={this.state.displaymode} selections={this.state.selections} />
@@ -215,7 +215,8 @@ var Display2 = React.createClass({
         var incommon = findCommonMatches(this.state.selection1, this.state.selection2);
         var row0 = testInCommon(data1, incommon, true);
         var row1 = testInCommon(data2, incommon, true);
-        var kitsCompared = testInCommon(data1, [this.state.selection2.name],true);
+        var kitsCompared = compareKitsInCommon(data1, [this.state.selection2],true);
+        var raw = compareRawdata(this.state.selection1, this.state.selection2, this.props.chromosome);
         return(
             <div>
             <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
@@ -224,7 +225,7 @@ var Display2 = React.createClass({
             <Chromosome deselect={this.props.deselect}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={1}/>
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row0} rows={rows} rownumber={0} />
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row1} rows={rows} rownumber={1} />
-            <ComparedKits data={kitsCompared} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={0} />
+            <ComparedKits data={kitsCompared} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={0} raw={raw} />
             </div>
         )
     }
@@ -258,7 +259,7 @@ var Display3 = React.createClass({
         var row1 = testInCommon(data1, incommon, true);
         var row2 = testInCommon(data2, incommon, true);
         var row3 = testInCommon(data2, incommon, false);
-        var kitsCompared = testInCommon(data1, [this.state.selection2.name],true);
+        var kitsCompared = compareKitsInCommon(data1, [this.state.selection2],true);
         return(
             <div>
             <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
@@ -313,8 +314,8 @@ var Display4 = React.createClass({
         var row1 = testInCommon(data2, incommon, true);
         var row2 = testInCommon(data2, incommon2, true);
         var row3 = testInCommon(data3, incommon2, true);
-        var kitsCompared1 = testInCommon(data1, [this.state.selection2.name],true);
-        var kitsCompared2 = testInCommon(data2, [this.state.selection3.name],true);
+        var kitsCompared1 = compareKitsInCommon(data1, [this.state.selection2],true);
+        var kitsCompared2 = compareKitsInCommon(data2, [this.state.selection3],true);
         return(
             <div>
             <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
@@ -416,6 +417,7 @@ var MatchBlock = React.createClass({
     }
 });
 
+
 var ComparedKits = React.createClass({
     render: function() {
         var numOfRows = this.props.rows;
@@ -436,6 +438,25 @@ var ComparedKits = React.createClass({
             margin: '0px',
             overflow: 'hidden',
         };
+        var rawstyle = {
+            position: 'absolute',
+            top: ypos,
+            left: xpos,
+            backgroundColor: '#c10000',
+            height: 3,
+            width: myWidth,
+            padding: '0px',
+            margin: '0px',
+            overflow: 'hidden',
+        };
+        var rawDisplay = null;
+        if (this.props.raw.length > 0) {
+            rawDisplay = (
+                <div style={rawstyle}>
+            <Graphic raw={this.props.raw} chromoIndex={this.props.chromoIndex} />
+            </div>
+            )
+        }
         if (this.props.data != null) {
             content = this.props.data.map( function(d) {
                 var blockxpos = d.start * scale;
@@ -456,11 +477,17 @@ var ComparedKits = React.createClass({
                        }
                                               );
         }
-        return <div style={mystyle}>
+        return (
+            <div>
+            <div style={mystyle}>
             {content}
             </div>
+            {rawDisplay}
+            </div> 
+        );
     }
 });
+
 
 
 var Chromosome = React.createClass({

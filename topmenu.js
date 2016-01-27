@@ -21,7 +21,7 @@ var MainWindow = React.createClass({
                       } );
     },
     handleButtonFile: function() {
-        this.setState({content: <FileHandler />
+        this.setState({content: <FileHandler kits={this.props.kits} />
                        ,
                       } );
     },

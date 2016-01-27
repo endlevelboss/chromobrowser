@@ -4,9 +4,12 @@ var interval = null;
 
 var FileHandler = React.createClass({
     getInitialState: function() {
-        return {files: 0}
+        return {
+            files: 0,
+            selectedKit: null
+               }
     },
-    handleClick: function(e) {
+    importCBdata: function(e) {
         var files = e.target.files;
         filesToLoad = files.length;
         this.setState({ files: filesToLoad });
@@ -15,11 +18,23 @@ var FileHandler = React.createClass({
             readfile(files[i], i);
         }
     },
+    kitChanged: function(e) {
+        this.setState({selectedKit: e.target.value});
+    },
+    importRawData: function(e) {
+        if (e.target != null) {
+            rawFileReader(e.target.files[0], this.state.selectedKit);
+        }
+    },
     render: function() {
         return(
             <div  style={styles.main} >
-            <input type="file" multiple onChange={this.handleClick} />
+            Choose chromosome data files to import: <br/>
+            <input type="file" multiple onChange={this.importCBdata} />
             <h1>{this.state.files}</h1>
+            
+            <KitSelector onChange={this.kitChanged} kitlist={this.props.kits} />
+            <input type="file" onChange={this.importRawData} />
             </div>
         );
     }
@@ -115,4 +130,82 @@ function checkMatch(matchname, kit) {
     var newmatch = new Match(matchname);
     kit.matches[kit.matches.length] = newmatch;
     return newmatch;
+}
+
+
+function rawFileReader(file, kitname){
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        var parsedFile = [];
+        var text = reader.result;
+        var result = text.split(/\r\n|\r|\n/g);
+        for (var i = 0; i < result.length; i++) {
+            var parsed = testAutosomal(result[i]);
+            if (parsed != null) {
+                parsedFile[parsedFile.length] = parsed;
+            }
+        }
+        
+        console.log('about to store data');
+        console.log(kitname);
+        
+        if (kitname != null) {
+            var value = {
+                name: kitname,
+                data: parsedFile
+            };
+            var transaction = db.transaction(["raw"], "readwrite");
+            var store = transaction.objectStore("raw");
+            var index = store.index('name');
+            var request = index.get(kitname);
+            request.onsuccess = function (e) {
+                var res = e.target.result;
+                if (res) {
+                    store.put(value);
+                    console.log('updating ' + kitname);
+                } else {
+                    var sjekk = store.add(value);
+                    console.log('adding ' + kitname);
+                    sjekk.onsuccess = function (e) {
+                        console.log('suksess');
+                    }
+
+                    sjekk.onerror = function (e) {
+                        console.log('ikke sukksess');
+                        console.log(e);
+                    }
+                }
+            }
+            request.onerror = function (e) {
+                console.log('Error gitt');
+                console.log(e.target.error);
+            }
+        }
+    }
+    reader.readAsText(file);
+}
+
+
+function testAutosomal(mystring){
+    var result = null;
+    if (mystring.charAt(0) == '"') {
+        var stringElements = mystring.split(',');
+        for (var i =0; i<stringElements.length; i++){
+            stringElements[i] = stripChars(stringElements[i]);
+        }
+        result = stringElements;
+//        var raw = new RawData(stringElements);
+//
+//        if (raw != null) {
+//            userRaw.raw[userRaw.raw.length] = raw;
+//        }
+    }
+    return result;
+}
+
+function stripChars(myString){
+    // removes first and last char in string
+    var newString = myString.substr(1, myString.length - 2);
+    return newString;
 }

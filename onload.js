@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
 function onStartup() {
     var transaction = db.transaction(['kits'], "readonly");
     var store = transaction.objectStore('kits');
-
     var cursor = store.openCursor();
     cursor.onsuccess = function (e) {
         var res = e.target.result;
