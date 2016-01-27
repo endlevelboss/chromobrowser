@@ -17,21 +17,21 @@ var styles = {
     },
     dataview: {
         backgroundColor: '#b49755',
-        position: 'fixed',
+        position: 'absolute',
         top: '30px',
         left: '0',
         height: '100%',
         width: '100%',
     },
     datatext: {
-        position: 'relative',
-        top: '50px',
-        left: '10px',
+        position: 'absolute',
+        top: '70px',
+        left: '0px',
     },
     datainfobox: {
         position: 'fixed',
         top: '50px',
-        left: '350px',
+        left: '400px',
     },
     matchblock: {
         position: 'absolute',

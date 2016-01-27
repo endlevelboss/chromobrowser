@@ -32,7 +32,7 @@ var MainWindow = React.createClass({
             <div style={styles.topmenu}>
             <button onClick={this.handleButtonBrowser}>Browser</button>
             <button onClick={this.handleButtonRelation}>Relations</button>
-            <button onClick={this.handleButtonData}>Data</button>
+            <button onClick={this.handleButtonData}>Kits</button>
             <button onClick={this.handleButtonFile}>File</button>
             </div>
             

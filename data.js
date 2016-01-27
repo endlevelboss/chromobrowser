@@ -13,17 +13,19 @@ var DataHandler = React.createClass({
         }
     },
     clickMatch: function(e) {
-        var mydata = getData(this.state.selection, e.target.innerHTML);
+        var mydata = getData(this.state.selection, e.target.value);
         this.setState({matchselection: mydata});
     },
     render: function() {
         return(
             <div>
                 <div style={styles.dataview} >
+                Kit: <br/>
                 <KitSelector onChange={this.handleChange} kitlist={this.props.kits}/>
                 </div>
                 <div style={styles.datatext}>
-                <MatchesList click={this.clickMatch} matches={this.state.selection} />
+                Matches: <br/>
+                <KitSelector onChange={this.clickMatch} kitlist={this.state.selection} />
                 </div>
                 <div style={styles.datainfobox}>
                 <DataDisplay data={this.state.matchselection} />
@@ -46,8 +48,8 @@ var DataDisplay = React.createClass({
         var content = null;
 //        console.log(this.props.data);
         if (this.props.data != null) {
-            content = this.props.data.map( function(datablock) {
-                return <DataLine data={datablock} />
+            content = this.props.data.map( function(datablock, index) {
+                return <DataLine data={datablock} key={index} />
             });
         }
         return (
@@ -56,31 +58,17 @@ var DataDisplay = React.createClass({
     }
 });
 
-
-var MatchesList = React.createClass({
-    render: function() {
-        var mymatches = null;
-        if (this.props.matches != null) {
-            mymatches = this.props.matches.map( function(match) {
-                return <a key={match.name} onClick={this.props.click}>{match.name}<br/></a>;
-            }.bind(this));
-        }
-        return (
-            <div>{mymatches}</div>
-        );
-    }
-});
-
 var KitSelector = React.createClass({
     render: function() {
-        var options = this.props.kitlist.map( function(kit) {
+        var options = this.props.kitlist.map( function(kit, index) {
             return <option key={kit.name} value={kit.name}>{kit.name}</option>;
-            
         });
         return(
-            <form onChange={this.props.onChange}><select>
+            <form onChange={this.props.onChange}>
+            <select>
             {options}
-            </select></form>
+            </select >
+            </form>
         );
     }
 });
