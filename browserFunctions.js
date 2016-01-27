@@ -185,37 +185,24 @@ function simpleRawSort(rawA, rawB) {
             a = rawA.shift();
         }
     }
-    //console.log(ordered);
     return ordered;
 }
 
 function compareRaw(rawA, rawB) {
     var raw = simpleRawSort(rawA, rawB);
-    //console.log(raw[0]);
-    
     var comparison = [];
     var compared = null;
     for (var i = 0; i < raw.length; i++) {
         var geneA = raw[i][0].split();
         var geneB = raw[i][1].split();
         compared = {
-            color: 'red',
+            color: 'black',
             position: raw[i][2]
         };
-        if (geneA[0] == geneB[0]) {
-            if (geneA[1] == geneB[1]) {
-                compared.color = 'green';
-            } else {
-                compared.color = 'yellow';
-            }
-        } else if (geneA[0] == geneB[1]) {
-            if (geneA[1] == geneB[0]) {
-                compared.color = 'green';
-            } else {
-                compared.color = 'yellow';
-            }
-        } else if (geneA[1] == geneB[0] || geneA[1] == geneB[1]) {
-            compared.color = 'yellow';
+        if (geneA[0] == geneB[0] && geneA[1] == geneB[1]) {
+                compared.color = 'limegreen';
+        } else if (geneA[0] == geneB[1] && geneA[1] == geneB[0]) {
+                compared.color = 'limegreen';
         }
         comparison[comparison.length] = compared;
     }

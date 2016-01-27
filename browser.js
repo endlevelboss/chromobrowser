@@ -260,6 +260,7 @@ var Display3 = React.createClass({
         var row2 = testInCommon(data2, incommon, true);
         var row3 = testInCommon(data2, incommon, false);
         var kitsCompared = compareKitsInCommon(data1, [this.state.selection2],true);
+        var raw = compareRawdata(this.state.selection1, this.state.selection2, this.props.chromosome);
         return(
             <div>
             <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
@@ -272,7 +273,7 @@ var Display3 = React.createClass({
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row1} rows={rows} rownumber={1} />
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row2} rows={rows} rownumber={2} />
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row3} rows={rows} rownumber={3} />
-            <ComparedKits data={kitsCompared} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={1} />
+            <ComparedKits data={kitsCompared} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={1} raw={raw} />
             </div>
         )
     }
@@ -315,7 +316,9 @@ var Display4 = React.createClass({
         var row2 = testInCommon(data2, incommon2, true);
         var row3 = testInCommon(data3, incommon2, true);
         var kitsCompared1 = compareKitsInCommon(data1, [this.state.selection2],true);
+        var raw1 = compareRawdata(this.state.selection1, this.state.selection2, this.props.chromosome);
         var kitsCompared2 = compareKitsInCommon(data2, [this.state.selection3],true);
+        var raw2 = compareRawdata(this.state.selection3, this.state.selection2, this.props.chromosome);
         return(
             <div>
             <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
@@ -329,8 +332,8 @@ var Display4 = React.createClass({
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row1} rows={rows} rownumber={1} />
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row2} rows={rows} rownumber={2} />
             <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row3} rows={rows} rownumber={3} />
-            <ComparedKits data={kitsCompared1} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={0} />
-            <ComparedKits data={kitsCompared2} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={2} />
+            <ComparedKits data={kitsCompared1} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={0} raw={raw1} />
+            <ComparedKits data={kitsCompared2} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={2} raw={raw2} />
             </div>
         )
     }
@@ -450,7 +453,7 @@ var ComparedKits = React.createClass({
             overflow: 'hidden',
         };
         var rawDisplay = null;
-        if (this.props.raw.length > 0) {
+        if (this.props.raw != null && this.props.raw.length > 0) {
             rawDisplay = (
                 <div style={rawstyle}>
             <Graphic raw={this.props.raw} chromoIndex={this.props.chromoIndex} />
@@ -503,7 +506,7 @@ var Chromosome = React.createClass({
         
         var cstyle = chromostyle(xpos, ypos, rectHeight, rectWidth, fSize);
         
-        var xposCentro = centrostart[this.props.chromoIndex] * scale;
+        var xposCentro = xpos + centrostart[this.props.chromoIndex] * scale;
         var widthCentro = (centroend[this.props.chromoIndex] - centrostart[this.props.chromoIndex]) * scale;
         var centrostyle = {
             position: 'absolute',
