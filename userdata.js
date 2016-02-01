@@ -34,6 +34,9 @@ function initializeUserdata() {
     var matches = getUserdata('matches');
     if (matches == null)
         setUserdata('matches',[]);
+    var matches = getUserdata('incommon');
+    if (matches == null)
+        setUserdata('incommon',[]);
     var relations = getUserdata('relations');
     if (relations == null)
         setUserdata('relations',[]);

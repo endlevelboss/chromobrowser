@@ -39,3 +39,31 @@ function checkData(mymatch, dataarray) {
     mymatch.matchblocks[mymatch.matchblocks.length] = mydata;
     return mydata;
 }
+
+function importInCommon(file, kitname, matchname) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        var text = reader.result;
+        var result = text.split(/\r\n|\r|\n/g);
+        var incommonlist = result.map( function(item) {
+            return parseInCommon(item);
+        });
+        addInCommon(kitname, matchname, incommonlist);
+    }
+    reader.readAsText(file);
+}
+
+function setDefaultMatch(kitmatches) {
+    var result = null;
+    if (kitmatches.length > 0){
+        result = kitmatches[0].name;
+    }
+    return result;
+}
+
+function parseInCommon(mystring) {
+    var stringArr = mystring.split('","');
+    var name = stringArr[0].substr(1, stringArr[0].length -1);
+    return name;
+}
