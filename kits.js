@@ -32,10 +32,10 @@ var DataHandler = React.createClass({
     },
     importInCommon: function(e) {
         var files = e.target.files;
-        importInCommon(files[0], this.state.selectedKit, this.state.selectedMatch);
+        if (this.state.selectedKit != null)
+            importInCommon(files[0], this.state.selectedKit, this.state.selectedMatch);
     },
     render: function() {
-        console.log(userdata);
         return(
             <div>
                 <div style={styles.dataview} >
@@ -79,9 +79,12 @@ var DataDisplay = React.createClass({
 
 var KitSelector = React.createClass({
     render: function() {
-        var options = this.props.kitlist.map( function(kit, index) {
-            return <option key={kit.name} value={kit.name}>{kit.name}</option>;
-        });
+        var options =null;
+        if (this.props.kitlist != null) {
+            options = this.props.kitlist.map( function(kit, index) {
+                return <option key={kit.name} value={kit.name}>{kit.name}</option>;
+            });
+        }
         return(
             <form onChange={this.props.onChange}>
             <select>

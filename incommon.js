@@ -21,7 +21,6 @@ function addInCommonMatch(name, kitname, matchname, continueLoop) {
         kit = new MatchData(kitname);
         match.data[match.data.length] = kit;
     }
-    console.log(kit.data);
     var incommon = findByNameIncommon(name, kit.data);
     if (incommon == null) {
         incommon = new MatchData(name);
@@ -30,6 +29,7 @@ function addInCommonMatch(name, kitname, matchname, continueLoop) {
             addInCommonMatch(matchname, kitname, name, false);
         }
     }
+    console.log('imported');
 }
 
 function findByNameIncommon(name, data) {
