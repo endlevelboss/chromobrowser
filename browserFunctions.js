@@ -53,8 +53,6 @@ function findCommonMatches(index1, index2){
     return result;
 }
 
-
-
 function findNames(owner){
     var matchnames = [];
     if (owner != null) {

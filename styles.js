@@ -1,6 +1,6 @@
 var styles = {
     topmenu: {
-        backgroundColor: '#2964a8',
+        backgroundColor: '#24478f',
         position: 'fixed',
         top: '0',
         left: '0',
@@ -8,7 +8,7 @@ var styles = {
         width: '100%',
     },
     main: {
-        backgroundColor: '#b49755',
+        backgroundColor: '#ffffff',
         position: 'absolute',
         top: '30px',
         left: '0',
@@ -16,7 +16,7 @@ var styles = {
         width: '100%',
     },
     dataview: {
-        backgroundColor: '#b49755',
+        backgroundColor: '#ffffff',
         position: 'absolute',
         top: '30px',
         left: '0',
@@ -71,7 +71,7 @@ var styles = {
 function matchstyle(xpos, ypos, rectHeight, rectWidth, color) {
     var mycolor = color;
     if (color == null)
-        mycolor = 'khaki';
+        mycolor = 'ccffcc';
     var matchblockStyle = {
             position: 'absolute',
             top: ypos,
@@ -96,13 +96,13 @@ function chromostyle(xpos, ypos, rectHeight, rectWidth, fSize) {
             position: 'absolute',
             top: ypos,
             left: xpos,
-            backgroundColor: '#006666',
+            backgroundColor: '#24478f',
             height: rectHeight,
             width: rectWidth,
             borderRadius: '10px',
             padding: '0px',
             margin: '0px',
-            color: '#007777',
+            color: '#2e5bb7',
             fontFamily: '"Arial"',
             fontSize: fSize,
             overflow: 'hidden',

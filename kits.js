@@ -87,7 +87,7 @@ var KitSelector = React.createClass({
         }
         return(
             <form onChange={this.props.onChange}>
-            <select>
+            <select id={this.props.id}>
             {options}
             </select >
             </form>

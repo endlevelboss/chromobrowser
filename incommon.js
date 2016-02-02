@@ -29,7 +29,6 @@ function addInCommonMatch(name, kitname, matchname, continueLoop) {
             addInCommonMatch(matchname, kitname, name, false);
         }
     }
-    console.log('imported');
 }
 
 function findByNameIncommon(name, data) {

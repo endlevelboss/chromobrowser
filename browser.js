@@ -11,15 +11,20 @@ var yoffset = 40;
 var BrowserHandler = React.createClass({
     getInitialState: function() {
         var initValue = null;
-        if (kits.length > 0)
+        var defaultKit = null;
+        if (kits.length > 0) {
             initValue = kits;
+            defaultKit = kits[0];
+        }
         return { chromosome: '1',
                 chromoIndex: 0,
                 displaymode: 'A',
                 matchSelect: null,
                 marker: null,
                 dragging: false,
-                selections: initValue,
+                kit1: defaultKit,
+                kit2: defaultKit,
+                kit3: defaultKit,
                }
     },
     selectedChromosome: function(e) {
@@ -36,7 +41,7 @@ var BrowserHandler = React.createClass({
     onClick: function(e) {
         if (e.button !== 0) return;
         this.setState({
-            dragging: false,
+            dragging: true,
             matchSelect: null,
         });
         e.stopPropagation();
@@ -78,6 +83,14 @@ var BrowserHandler = React.createClass({
             e.stopPropagation();
         }
     },
+    kitSelection: function(e) {
+        if (e.target.id == 1)
+            this.setState({kit1: getKit(e.target.value)});
+        if (e.target.id == 2)
+            this.setState({kit2: getKit(e.target.value)});
+        if (e.target.id == 3)
+            this.setState({kit3: getKit(e.target.value)});
+    },
     update: function() {
         this.forceUpdate();
     },
@@ -99,7 +112,10 @@ var BrowserHandler = React.createClass({
                     <option value='E'>Compare four kits, in common</option>
                 </select>
             </form>
-            <DisplaySelection deselect={this.onClick} click={this.clickMatchblock} kits={this.props.kits} selection={this.state.selection} chromosome={this.state.chromosome} chromoindex={this.state.chromoIndex} displaymode={this.state.displaymode} selections={this.state.selections} matchselection={this.state.matchSelect} />
+            <KitSelector id={1} onChange={this.kitSelection} kitlist={this.props.kits} />
+            <KitSelector id={2} onChange={this.kitSelection} kitlist={this.props.kits} />
+            <KitSelector id={3} onChange={this.kitSelection} kitlist={this.props.kits} />
+            <DisplaySelection deselect={this.onClick} click={this.clickMatchblock}  chromosome={this.state.chromosome} chromoindex={this.state.chromoIndex} displaymode={this.state.displaymode}  matchselection={this.state.matchSelect} kit1={this.state.kit1} kit2={this.state.kit2} kit3={this.state.kit3} />
             {this.state.marker}
             {matchinfo}
             </div>
@@ -141,16 +157,49 @@ var DisplaySelection = React.createClass({
     render: function() {
         var incommonlist = findAllIncommon(this.props.matchselection);
         if (this.props.displaymode == 'A') {
-            return ( <Display1 deselect={this.props.deselect} click={this.props.click} kits={this.props.kits} selection={this.props.selection} chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist}/> 
+            var data = sortChromodata(this.props.kit1, this.props.chromosome);
+            return ( <Display deselect={this.props.deselect} click={this.props.click}  chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist} data={[data]} compare={[]}/> 
                    );
-        } else if (this.props.displaymode == 'B'){
-            return ( <Display2 deselect={this.props.deselect} click={this.props.click} kits={this.props.kits} selection={this.props.selection} chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist}/> 
+        } 
+        else if (this.props.displaymode == 'B'){
+            var data1 = sortChromodata(this.props.kit1, this.props.chromosome);
+            var data2 = sortChromodata(this.props.kit2, this.props.chromosome);
+            var incommon = findCommonMatches(this.props.kit1, this.props.kit2);
+            var row0 = testInCommon(data1, incommon, true);
+            var row1 = testInCommon(data2, incommon, true);
+            var kitsCompared = compareKitsInCommon(data1, [this.props.kit2],true);
+            var raw = compareRawdata(this.props.kit1, this.props.kit2, this.props.chromosome);
+            return ( <Display deselect={this.props.deselect} click={this.props.click}  chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist} data={[row0, row1]} compare={[[kitsCompared, raw, 0]]}/> 
                    );
-        } else if (this.props.displaymode == 'C'){
-            return ( <Display3 deselect={this.props.deselect} click={this.props.click} kits={this.props.kits} selection={this.props.selection} chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist}/> 
+        } 
+        else if (this.props.displaymode == 'C'){
+            var data1 = sortChromodata(this.props.kit1, this.props.chromosome);
+            var data2 = sortChromodata(this.props.kit2, this.props.chromosome);
+            var incommon = findCommonMatches(this.props.kit1, this.props.kit2);
+            var row0 = testInCommon(data1, incommon, false);
+            var row1 = testInCommon(data1, incommon, true);
+            var row2 = testInCommon(data2, incommon, true);
+            var row3 = testInCommon(data2, incommon, false);
+            var kitsCompared = compareKitsInCommon(data1, [this.props.kit2],true);
+            var raw = compareRawdata(this.props.kit1, this.props.kit2, this.props.chromosome);
+            return ( <Display deselect={this.props.deselect} click={this.props.click}  chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist} data={[row0, row1, row2, row3]} compare={[[kitsCompared, raw, 1]]}/> 
                    );
-        } else if (this.props.displaymode == 'D'){
-            return ( <Display4 deselect={this.props.deselect} click={this.props.click} kits={this.props.kits} selection={this.props.selection} chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist}/> 
+        } 
+        else if (this.props.displaymode == 'D'){
+            var data1 = sortChromodata(this.props.kit1, this.props.chromosome);
+            var data2 = sortChromodata(this.props.kit2, this.props.chromosome);
+            var data3 = sortChromodata(this.props.kit3, this.props.chromosome);
+            var incommon = findCommonMatches(this.props.kit1, this.props.kit2);
+            var incommon2 = findCommonMatches(this.props.kit3, this.props.kit2);
+            var row0 = testInCommon(data1, incommon, true);
+            var row1 = testInCommon(data2, incommon, true);
+            var row2 = testInCommon(data2, incommon2, true);
+            var row3 = testInCommon(data3, incommon2, true);
+            var kitsCompared1 = compareKitsInCommon(data1, [this.props.kit2],true);
+            var raw1 = compareRawdata(this.props.kit1, this.props.kit2, this.props.chromosome);
+            var kitsCompared2 = compareKitsInCommon(data2, [this.props.kit3],true);
+            var raw2 = compareRawdata(this.props.kit3, this.props.kit2, this.props.chromosome);
+            return ( <Display deselect={this.props.deselect} click={this.props.click}  chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist} data={[row0, row1, row2, row3]} compare={[[kitsCompared1, raw1, 0],[kitsCompared2, raw2, 2]]}/> 
                    );
         }
         
@@ -161,183 +210,30 @@ var DisplaySelection = React.createClass({
 });
 
 
-
-
-var Display1 = React.createClass({
-    getInitialState: function() {
-        var initValue = null;
-        if (kits.length > 0)
-            initValue = kits[0];
-        return { selection: initValue,
-               }
-    },
-    handleChange: function(e) {
-        if(e.target != null) {
-            this.setState({selection: getKit(e.target.value)});
+var Display = React.createClass({
+   render: function() {
+       var length = this.props.data.length;
+       var chromosome = [];
+       for (var i = 0; i< length; i++){
+            chromosome[i] = <Chromosome key={i} deselect={this.props.deselect}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={length} rownumber={i}/>
         }
-    },
-    render: function() {
-        var rows = 1;
-        var data = sortChromodata(this.state.selection, this.props.chromosome);
-        return(
-            <div>
-            <KitSelector onChange={this.handleChange} kitlist={this.props.kits} />
-            <Chromosome deselect={this.props.deselect}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={0}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={data} rows={rows} rownumber={0} incommon={this.props.incommon}/>
-            </div>
-        )
-    }
-});
-
-var Display2 = React.createClass({
-    getInitialState: function() {
-        var initValue = null;
-        if (kits.length > 0)
-            initValue = kits[0];
-        return { selection1: initValue,
-                selection2: initValue,
-               }
-    },
-    handleChange1: function(e) {
-        if(e.target != null) {
-            this.setState({selection1: getKit(e.target.value)});
+       var matchblocks = [];
+       for (var i = 0; i< length; i++){
+            matchblocks[i] = <MatchBlocks key={i} click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={this.props.data[i]} rows={length} rownumber={i} incommon={this.props.incommon}/>
         }
-    },
-    handleChange2: function(e) {
-        if(e.target != null) {
-            this.setState({selection2: getKit(e.target.value)});
-        }
-    },
-    render: function() {
-        var rows = 2;
-        var data1 = sortChromodata(this.state.selection1, this.props.chromosome);
-        var data2 = sortChromodata(this.state.selection2, this.props.chromosome);
-        
-        var incommon = findCommonMatches(this.state.selection1, this.state.selection2);
-        var row0 = testInCommon(data1, incommon, true);
-        var row1 = testInCommon(data2, incommon, true);
-        var kitsCompared = compareKitsInCommon(data1, [this.state.selection2],true);
-        var raw = compareRawdata(this.state.selection1, this.state.selection2, this.props.chromosome);
-        return(
-            <div>
-            <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
-            <KitSelector onChange={this.handleChange2} kitlist={this.props.kits} />
-            <Chromosome deselect={this.props.deselect}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={0}/>
-            <Chromosome deselect={this.props.deselect}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={1}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row0} rows={rows} rownumber={0} incommon={this.props.incommon}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row1} rows={rows} rownumber={1} incommon={this.props.incommon}/>
-            <ComparedKits data={kitsCompared} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={0} raw={raw} />
-            </div>
-        )
-    }
-});
-
-var Display3 = React.createClass({
-    getInitialState: function() {
-        var initValue = null;
-        if (kits.length > 0)
-            initValue = kits[0];
-        return { selection1: initValue,
-                selection2: initValue,
-               }
-    },
-    handleChange1: function(e) {
-        if(e.target != null) {
-            this.setState({selection1: getKit(e.target.value)});
-        }
-    },
-    handleChange2: function(e) {
-        if(e.target != null) {
-            this.setState({selection2: getKit(e.target.value)});
-        }
-    },
-    render: function() {
-        var rows = 4;
-        var data1 = sortChromodata(this.state.selection1, this.props.chromosome);
-        var data2 = sortChromodata(this.state.selection2, this.props.chromosome);
-        var incommon = findCommonMatches(this.state.selection1, this.state.selection2);
-        var row0 = testInCommon(data1, incommon, false);
-        var row1 = testInCommon(data1, incommon, true);
-        var row2 = testInCommon(data2, incommon, true);
-        var row3 = testInCommon(data2, incommon, false);
-        var kitsCompared = compareKitsInCommon(data1, [this.state.selection2],true);
-        var raw = compareRawdata(this.state.selection1, this.state.selection2, this.props.chromosome);
-        return(
-            <div>
-            <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
-            <KitSelector onChange={this.handleChange2} kitlist={this.props.kits} />
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={0}/>
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={1}/>
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={2}/>
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={3}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row0} rows={rows} rownumber={0} incommon={this.props.incommon}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row1} rows={rows} rownumber={1} incommon={this.props.incommon}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row2} rows={rows} rownumber={2} incommon={this.props.incommon}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row3} rows={rows} rownumber={3} incommon={this.props.incommon}/>
-            <ComparedKits data={kitsCompared} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={1} raw={raw} />
-            </div>
-        )
-    }
-});
-
-var Display4 = React.createClass({
-    getInitialState: function() {
-        var initValue = null;
-        if (kits.length > 0)
-            initValue = kits[0];
-        return { selection1: initValue,
-                selection2: initValue,
-                selection3: initValue,
-               }
-    },
-    handleChange1: function(e) {
-        if(e.target != null) {
-            this.setState({selection1: getKit(e.target.value)});
-        }
-    },
-    handleChange2: function(e) {
-        if(e.target != null) {
-            this.setState({selection2: getKit(e.target.value)});
-        }
-    },
-    handleChange3: function(e) {
-        if(e.target != null) {
-            this.setState({selection3: getKit(e.target.value)});
-        }
-    },
-    render: function() {
-        var rows = 4;
-        var data1 = sortChromodata(this.state.selection1, this.props.chromosome);
-        var data2 = sortChromodata(this.state.selection2, this.props.chromosome);
-        var data3 = sortChromodata(this.state.selection3, this.props.chromosome);
-        var incommon = findCommonMatches(this.state.selection1, this.state.selection2);
-        var incommon2 = findCommonMatches(this.state.selection3, this.state.selection2);
-        var row0 = testInCommon(data1, incommon, true);
-        var row1 = testInCommon(data2, incommon, true);
-        var row2 = testInCommon(data2, incommon2, true);
-        var row3 = testInCommon(data3, incommon2, true);
-        var kitsCompared1 = compareKitsInCommon(data1, [this.state.selection2],true);
-        var raw1 = compareRawdata(this.state.selection1, this.state.selection2, this.props.chromosome);
-        var kitsCompared2 = compareKitsInCommon(data2, [this.state.selection3],true);
-        var raw2 = compareRawdata(this.state.selection3, this.state.selection2, this.props.chromosome);
-        return(
-            <div>
-            <KitSelector onChange={this.handleChange1} kitlist={this.props.kits} />
-            <KitSelector onChange={this.handleChange2} kitlist={this.props.kits} />
-            <KitSelector onChange={this.handleChange3} kitlist={this.props.kits} />
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={0}/>
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={1}/>
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={2}/>
-            <Chromosome deselect={this.props.deselect} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={rows} rownumber={3}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row0} rows={rows} rownumber={0} incommon={this.props.incommon}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row1} rows={rows} rownumber={1} incommon={this.props.incommon}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row2} rows={rows} rownumber={2} incommon={this.props.incommon}/>
-            <MatchBlocks click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={row3} rows={rows} rownumber={3} incommon={this.props.incommon}/>
-            <ComparedKits data={kitsCompared1} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={0} raw={raw1} />
-            <ComparedKits data={kitsCompared2} chromoIndex={this.props.chromoIndex} rows={rows} rownumber={2} raw={raw2} />
-            </div>
-        )
-    }
+       var compared = [];
+       
+       for (var i=0; i<this.props.compare.length; i++) {
+           compared[i] = <ComparedKits key={i} data={this.props.compare[i][0]} chromoIndex={this.props.chromoIndex} rows={length} rownumber={this.props.compare[i][2]} raw={this.props.compare[i][1]} />
+       }
+       return(
+           <div>
+           {chromosome}
+           {matchblocks}
+           {compared}
+           </div>
+       );
+   } 
 });
 
 
