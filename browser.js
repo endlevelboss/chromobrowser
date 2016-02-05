@@ -38,45 +38,7 @@ var BrowserHandler = React.createClass({
             this.setState({displaymode: e.target.value});
         }
     },
-    onClick: function(e) {
-        if (e.button !== 0) return;
-        this.setState({
-            dragging: true,
-            matchSelect: null,
-        });
-        e.stopPropagation();
-    },
-    componentDidUpdate: function (props, state) {
-        if (this.state.dragging && !state.dragging) {
-          document.addEventListener('mousemove', this.onMouseMove)
-          document.addEventListener('mouseup', this.onMouseUp)
-        } else if (!this.state.dragging && state.dragging) {
-          document.removeEventListener('mousemove', this.onMouseMove)
-          document.removeEventListener('mouseup', this.onMouseUp)
-        }
-    },
-    onMouseMove: function(e) {
-        var xpos = e.pageX;
-        var mystyle = {
-            position: 'absolute',
-            top: '25px',
-            left: xpos + 'px',
-            height: '550px',
-            width: '2px',
-            backgroundColor: 'darkslategray',
-            zIndex: '200',
-        };
-        var mymarker = <div style={mystyle} />
-        this.setState({
-            marker: mymarker,
-        });
-        e.stopPropagation();
-    },
-    onMouseUp: function(e) {
-        this.setState({dragging: false})
-        e.stopPropagation()
-        e.preventDefault()
-    },
+    
     clickMatchblock: function(e) {
         if (e.target.attributes.value != undefined) {
             this.setState({matchSelect: e.target.attributes.value.value});
@@ -116,7 +78,6 @@ var BrowserHandler = React.createClass({
             <KitSelector id={2} onChange={this.kitSelection} kitlist={this.props.kits} />
             <KitSelector id={3} onChange={this.kitSelection} kitlist={this.props.kits} />
             <DisplaySelection deselect={this.onClick} click={this.clickMatchblock}  chromosome={this.state.chromosome} chromoindex={this.state.chromoIndex} displaymode={this.state.displaymode}  matchselection={this.state.matchSelect} kit1={this.state.kit1} kit2={this.state.kit2} kit3={this.state.kit3} />
-            {this.state.marker}
             {matchinfo}
             </div>
         );
@@ -211,11 +172,12 @@ var DisplaySelection = React.createClass({
 
 
 var Display = React.createClass({
+    
    render: function() {
        var length = this.props.data.length;
        var chromosome = [];
        for (var i = 0; i< length; i++){
-            chromosome[i] = <Chromosome key={i} deselect={this.props.deselect}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={length} rownumber={i}/>
+            chromosome[i] = <Chromosome key={i} deselect={this.onClick}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={length} rownumber={i}/>
         }
        var matchblocks = [];
        for (var i = 0; i< length; i++){
@@ -228,12 +190,63 @@ var Display = React.createClass({
        }
        return(
            <div>
-           {chromosome}
-           {matchblocks}
-           {compared}
+            <DisplayWithMarker chromosome={chromosome} matchblocks={matchblocks} compared={compared} />
            </div>
        );
    } 
+});
+
+var DisplayWithMarker = React.createClass({
+    getInitialState: function() {
+        return { 
+                marker: null,
+                dragging: false,
+               }
+    },
+    onClick: function(e) {
+        if (e.button !== 0) return;
+        if (this.state.dragging == false) {
+            this.setState({
+                dragging: true,
+                matchSelect: null,
+            });
+            document.addEventListener('mousemove', this.onMouseMove);
+        } else {
+            this.setState({
+               dragging: false, 
+            });
+            document.removeEventListener('mousemove', this.onMouseMove);
+        }
+        e.stopPropagation();
+    },
+    onMouseMove: function(e) {
+        var xpos = e.pageX;
+        var mystyle = {
+            position: 'absolute',
+            top: '25px',
+            left: xpos + 'px',
+            height: '550px',
+            width: '2px',
+            backgroundColor: 'black',
+            zIndex: '200',
+        };
+        var mymarker = <div style={mystyle} />
+        this.setState({
+            marker: mymarker,
+        });
+        e.stopPropagation();
+    },
+    render: function() {
+        return(
+           <div onClick={this.onClick} >
+           {this.props.chromosome}
+           {this.props.matchblocks}
+           {this.props.compared}
+           
+            {this.state.marker}
+           </div>
+       );
+    }
 });
 
 
