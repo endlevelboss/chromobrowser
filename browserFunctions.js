@@ -18,12 +18,113 @@ function sortChromodata(myowner, selectedChromosome){
     return mydata;
 }
 
-function checkColumnList(datalist) {
+function getHeritageMap(kitname) {
+    var kitBox = findRelation(kitname);
+    var father = findRelation(kitBox.father);
+    var mother = findRelation(kitBox.mother);
+    
+    var viaDad = false;
+    var viaMum = false;
+    var mymap = [];
+    
+    var personBoxes = getRelations();
+    for (var j in personBoxes) {
+        viaDad = traceAncestor(father, personBoxes[j].name);
+        viaMum = traceAncestor(mother, personBoxes[j].name);
+        var mapping = null;
+        if (viaDad) {
+            mapping = [personBoxes[j].name, 0];
+        } else if (viaMum) {
+            mapping = [personBoxes[j].name, 1];
+        } else {
+            mapping = [personBoxes[j].name, 2];
+        }
+        mymap[mymap.length] = mapping;
+    }
+    return mymap;
+}
+
+function traceAncestor(personBox, ancestorname) {
+    if (personBox == null) {
+        return false;
+    }
+    if (personBox.name == ancestorname) {
+        return true;
+    }
+    var dad = findRelation(personBox.father);
+    var mum = findRelation(personBox.mother);
+    if (traceAncestor(dad, ancestorname) || traceAncestor(mum, ancestorname)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function findCommonLineage(kitname, heritage) {
+    var heritageMap = getHeritageMap(kitname);
+    var matchvalue = 2;
+    for (var i in heritageMap) {
+        if (heritageMap[i][0] == heritage) {
+            matchvalue = heritageMap[i][1];
+        }
+    }
+    return matchvalue;
+}
+
+function checkColumnList(datalist, isParentsChecked, kitname) {
+    //console.log('recalcing matches: ' + isParentsChecked);
+    if (isParentsChecked) {
+        var fathermatches = [];
+        var fathercolumns = [];
+        var mothermatches = [];
+        var mothercolumns = [];
+        var unknownmatches = [];
+        var unknowncolumns = [];
+        for (var i in datalist) {
+            var match = getMatch(datalist[i].match);
+            var heritage = getCustomdata(match, 'relation');
+            if (heritage != null) {
+                var myheritage = findCommonLineage(kitname, heritage);
+                datalist[i].bigcolumn = myheritage;
+                if (myheritage == 0) {
+                    fathermatches[fathermatches.length] = datalist[i];
+                } else if (myheritage == 1) {
+                    mothermatches[mothermatches.length] = datalist[i];
+                } else {
+                    unknownmatches[unknownmatches.length] = datalist[i];
+                }
+            } else {
+                datalist[i].bigcolumn = 2;
+                unknownmatches[unknownmatches.length] = datalist[i];
+            }
+        }
+
+        for (var i =0; i< fathermatches.length; i++) {
+            checkColumn(fathercolumns, fathermatches[i], 0);
+        }
+        for (var i =0; i< mothermatches.length; i++) {
+            checkColumn(mothercolumns, mothermatches[i], 0);
+        }
+        for (var i =0; i< unknownmatches.length; i++) {
+            checkColumn(unknowncolumns, unknownmatches[i], 0);
+        }
+
+        var flength = fathercolumns.length;
+        var mlength = mothercolumns.length;
+        if (flength == 0) {
+            flength = 1;
+        }
+        if (mlength == 0) {
+            mlength = 1;
+        }
+        return [flength, mlength, unknowncolumns.length];
+    } else {
         var columns = [];
         for (var i in datalist) {
             checkColumn(columns, datalist[i], 0);
         }
         return [columns.length];
+    }
 }
 
 function checkColumn(columnarray, data, currentcolumn) {
@@ -119,9 +220,11 @@ function setCustomdata(match, type, value) {
 
 function getCustomdata(match, type) {
     var value = null;
-    for (var i = 0; i < match.customdata.length; i++) {
-        if (match.customdata[i].type == type) {
-            value = match.customdata[i].data;
+    if(match != null) {
+        for (var i = 0; i < match.customdata.length; i++) {
+            if (match.customdata[i].type == type) {
+                value = match.customdata[i].data;
+            }
         }
     }
     return value;
