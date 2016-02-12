@@ -184,13 +184,9 @@ var Display = React.createClass({
     
    render: function() {
        var length = this.props.data.length;
-       var chromosome = [];
-       for (var i = 0; i< length; i++){
-            chromosome[i] = <Chromosome key={i} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={length} rownumber={i}/>
-        }
        var matchblocks = [];
        for (var i = 0; i< length; i++){
-            matchblocks[i] = <MatchBlocks key={i} click={this.props.click} chromoIndex={this.props.chromoIndex} matchdata={this.props.data[i]} rows={length} rownumber={i} incommon={this.props.incommon} user={this.props.users[i]} useParent={this.props.useParent}/>
+            matchblocks[i] = <MatchBlocks key={i} click={this.props.click} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} matchdata={this.props.data[i]} rows={length} rownumber={i} incommon={this.props.incommon} user={this.props.users[i]} useParent={this.props.useParent}/>
         }
        var compared = [];
        
@@ -199,7 +195,7 @@ var Display = React.createClass({
        }
        return(
            <div>
-            <DisplayWithMarker deselect={this.props.deselect} chromosome={chromosome} matchblocks={matchblocks} compared={compared} />
+            <DisplayWithMarker deselect={this.props.deselect} matchblocks={matchblocks} compared={compared} />
            </div>
        );
    } 
@@ -249,7 +245,6 @@ var DisplayWithMarker = React.createClass({
     render: function() {
         return(
            <div onClick={this.onClick} >
-           {this.props.chromosome}
            {this.props.matchblocks}
            {this.props.compared}
            
@@ -296,17 +291,12 @@ var ChromoSelector = React.createClass({
 
 var MatchBlocks = React.createClass({
     render: function() {
-        var overlay = null;
         var content = null;
         
         var clist = checkColumnList(this.props.matchdata, this.props.useParent, this.props.user.name);
         var chromosome = this.props.chromoIndex;
         var rows = this.props.rows;
         var rownumber = this.props.rownumber;
-        
-        if (this.props.useParent) {
-            overlay = <AssumedAncestryOverlay list={clist} rows={rows} rownumber={rownumber} />
-        }
         if (this.props.matchdata != null) {
             content = this.props.matchdata.map( function(data) {
                 return( <MatchBlock key={data.match + data.chromo + data.start} chromoIndex={chromosome} matchdata={data} columnlist={clist} rows={rows} rownumber={rownumber} click={this.props.click} incommon={this.props.incommon}/>
@@ -316,7 +306,7 @@ var MatchBlocks = React.createClass({
         }
         return ( 
             <div>
-            {overlay}
+            <Chromosome chromosome={this.props.chromosome} list={clist} chromoIndex={this.props.chromoIndex} rows={this.props.rows} rownumber={this.props.rownumber} useParent={this.props.useParent} />
             {content}
             </div>
                );
@@ -333,12 +323,12 @@ var AssumedAncestryOverlay = React.createClass({
         
         var rowheight = (canvasheight - 50 - 6 * (numOfRows - 1)) / numOfRows;
         var yscale = (canvasheight - 50 - 6 * (numOfRows - 1)) / (columns * numOfRows);
-        var rectWidth = canvaswidth - 50;
+        var rectWidth = canvaswidth;
         var rectHeight = yscale * this.props.list[0];
-        var xpos = 50;
-        var ypos = (rowheight + 6) * this.props.rownumber + 25;
+        var xpos = 0;
+        var ypos = (rowheight + 6) * this.props.rownumber;
         var dadstyle = overlaystyle(xpos, ypos, rectHeight, rectWidth, 10, '#407dbf', 'lightblue');
-        ypos = (rowheight + 6) * this.props.rownumber + 25 + rectHeight;
+        ypos = (rowheight + 6) * this.props.rownumber + rectHeight;
         rectHeight = yscale * this.props.list[1];
         var mumstyle = overlaystyle(xpos, ypos, rectHeight, rectWidth, 10, '#ff8080', 'red');
         return (
@@ -491,8 +481,15 @@ var Chromosome = React.createClass({
             overflow: 'hidden',
         };
         
+        
+        var overlay = null;
+        if (this.props.useParent) {
+            overlay = <AssumedAncestryOverlay list={this.props.list} rows={this.props.rows} rownumber={this.props.rownumber} />
+        }
+        
         return(
             <div style={cstyle} >
+            {overlay}
             <div style={centrostyle}  />
             {this.props.chromosome}
             </div>
