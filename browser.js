@@ -39,7 +39,9 @@ var BrowserHandler = React.createClass({
             this.setState({displaymode: e.target.value});
         }
     },
-    
+    onClick: function(e) {
+        this.setState({matchSelect: null,})  ;
+    },
     clickMatchblock: function(e) {
         if (e.target.attributes.value != undefined) {
             this.setState({matchSelect: e.target.attributes.value.value});
@@ -184,7 +186,7 @@ var Display = React.createClass({
        var length = this.props.data.length;
        var chromosome = [];
        for (var i = 0; i< length; i++){
-            chromosome[i] = <Chromosome key={i} deselect={this.onClick}  chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={length} rownumber={i}/>
+            chromosome[i] = <Chromosome key={i} chromoIndex={this.props.chromoIndex} chromosome={this.props.chromosome} rows={length} rownumber={i}/>
         }
        var matchblocks = [];
        for (var i = 0; i< length; i++){
@@ -197,7 +199,7 @@ var Display = React.createClass({
        }
        return(
            <div>
-            <DisplayWithMarker chromosome={chromosome} matchblocks={matchblocks} compared={compared} />
+            <DisplayWithMarker deselect={this.props.deselect} chromosome={chromosome} matchblocks={matchblocks} compared={compared} />
            </div>
        );
    } 
@@ -212,6 +214,7 @@ var DisplayWithMarker = React.createClass({
     },
     onClick: function(e) {
         if (e.button !== 0) return;
+        this.props.deselect();
         if (this.state.dragging == false) {
             this.setState({
                 dragging: true,
@@ -293,12 +296,17 @@ var ChromoSelector = React.createClass({
 
 var MatchBlocks = React.createClass({
     render: function() {
+        var overlay = null;
         var content = null;
-        //var columnlist = checkColumnList(data);
+        
         var clist = checkColumnList(this.props.matchdata, this.props.useParent, this.props.user.name);
         var chromosome = this.props.chromoIndex;
         var rows = this.props.rows;
         var rownumber = this.props.rownumber;
+        
+        if (this.props.useParent) {
+            overlay = <AssumedAncestryOverlay list={clist} rows={rows} rownumber={rownumber} />
+        }
         if (this.props.matchdata != null) {
             content = this.props.matchdata.map( function(data) {
                 return( <MatchBlock key={data.match + data.chromo + data.start} chromoIndex={chromosome} matchdata={data} columnlist={clist} rows={rows} rownumber={rownumber} click={this.props.click} incommon={this.props.incommon}/>
@@ -306,9 +314,41 @@ var MatchBlocks = React.createClass({
                        }.bind(this)
                                               );
         }
-        return ( <div>{content}</div>
+        return ( 
+            <div>
+            {overlay}
+            {content}
+            </div>
                );
     }
+});
+
+var AssumedAncestryOverlay = React.createClass({
+    render: function() {
+        var columns = 0;
+        var numOfRows = this.props.rows;
+        for (var colcount = 0; colcount < this.props.list.length; colcount++) {
+            columns = columns + this.props.list[colcount];
+        }
+        
+        var rowheight = (canvasheight - 50 - 6 * (numOfRows - 1)) / numOfRows;
+        var yscale = (canvasheight - 50 - 6 * (numOfRows - 1)) / (columns * numOfRows);
+        var rectWidth = canvaswidth - 50;
+        var rectHeight = yscale * this.props.list[0];
+        var xpos = 50;
+        var ypos = (rowheight + 6) * this.props.rownumber + 25;
+        var dadstyle = overlaystyle(xpos, ypos, rectHeight, rectWidth, 10, '#407dbf', 'lightblue');
+        ypos = (rowheight + 6) * this.props.rownumber + 25 + rectHeight;
+        rectHeight = yscale * this.props.list[1];
+        var mumstyle = overlaystyle(xpos, ypos, rectHeight, rectWidth, 10, '#ff8080', 'red');
+        return (
+            <div>
+            <div style={dadstyle}></div>
+            <div style={mumstyle}></div>
+            </div>
+        );
+    }
+    
 });
 
 var MatchBlock = React.createClass({
@@ -452,8 +492,8 @@ var Chromosome = React.createClass({
         };
         
         return(
-            <div style={cstyle} onClick={this.props.deselect}>
-            <div style={centrostyle} onClick={this.props.deselect} />
+            <div style={cstyle} >
+            <div style={centrostyle}  />
             {this.props.chromosome}
             </div>
         );

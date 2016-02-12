@@ -109,4 +109,22 @@ function chromostyle(xpos, ypos, rectHeight, rectWidth, fSize) {
         };
     return chromostyle;
 }
+
+function overlaystyle(xpos, ypos, rectHeight, rectWidth, fSize, color, textcolor) {
+    var chromostyle = {
+            position: 'absolute',
+            top: ypos,
+            left: xpos,
+            backgroundColor: color,
+            height: rectHeight,
+            width: rectWidth,
+            padding: '0px',
+            margin: '0px',
+            color: textcolor,
+            fontFamily: '"Arial"',
+            fontSize: fSize,
+            overflow: 'hidden',
+        };
+    return chromostyle;
+}
     
