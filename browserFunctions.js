@@ -1,13 +1,18 @@
 function sortChromodata(myowner, selectedChromosome){
+    var exclusionlist = getExclusionList(myowner.name);
+    
     var mydata = [];
     if (myowner != null) {
     
     for (var i in myowner.matches){
-        for (var j in myowner.matches[i].matchblocks) {
-            var currentData = myowner.matches[i].matchblocks[j];
-            
-            if (currentData.chromo == selectedChromosome && Number(currentData.lngth) >= Number(selectedLimit)) {
-                mydata[mydata.length] = new Data(currentData.match, currentData.chromo, currentData.start, currentData.end, currentData.lngth, currentData.snp);
+        
+        if (exclusionlist.indexOf(myowner.matches[i].name) < 0) {
+            for (var j in myowner.matches[i].matchblocks) {
+                var currentData = myowner.matches[i].matchblocks[j];
+
+                if (currentData.chromo == selectedChromosome && Number(currentData.lngth) >= Number(selectedLimit)) {
+                    mydata[mydata.length] = new Data(currentData.match, currentData.chromo, currentData.start, currentData.end, currentData.lngth, currentData.snp);
+                }
             }
         }
     }
@@ -341,8 +346,6 @@ function compareRawdata(selectedA, selectedB, selectedChromosome) {
 }
 
 function drawRaw(){
-    
-    
     // alert('tegner raw');
     var canvas = document.getElementById("chromobrowser");
     var context = canvas.getContext("2d");
@@ -372,6 +375,4 @@ function drawRaw(){
         var xpos = data[i].position * scale + 25;
         context.fillRect(xpos, ypos, 1, 3);
     }
-
-    
 }

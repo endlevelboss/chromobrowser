@@ -75,9 +75,10 @@ var BrowserHandler = React.createClass({
                 <select>
                     <option value='A'>Single kit</option>
                     <option value='B'>Compare two kits, in common</option>
+                    <option value='E'>Compare two kits, not in common</option>
                     <option value='C'>Compare two kits</option>
                     <option value='D'>Compare three kits, in common</option>
-                    <option value='E'>Compare four kits, in common</option>
+                    
                 </select>
             </form>
             <form>
@@ -172,6 +173,17 @@ var DisplaySelection = React.createClass({
             return ( <Display deselect={this.props.deselect} click={this.props.click}  chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist} data={[row0, row1, row2, row3]} users={[this.props.kit1,this.props.kit2,this.props.kit2, this.props.kit3]} compare={[[kitsCompared1, raw1, 0],[kitsCompared2, raw2, 2]]} useParent={this.props.useParent}/> 
                    );
         }
+        else if (this.props.displaymode == 'E'){
+            var data1 = sortChromodata(this.props.kit1, this.props.chromosome);
+            var data2 = sortChromodata(this.props.kit2, this.props.chromosome);
+            var incommon = findCommonMatches(this.props.kit1, this.props.kit2);
+            var row0 = testInCommon(data1, incommon, false);
+            var row1 = testInCommon(data2, incommon, false);
+            var kitsCompared = compareKitsInCommon(data1, [this.props.kit2],true);
+            var raw = compareRawdata(this.props.kit1, this.props.kit2, this.props.chromosome);
+            return ( <Display deselect={this.props.deselect} click={this.props.click}  chromosome={this.props.chromosome} chromoIndex={this.props.chromoindex} incommon={incommonlist} data={[row0, row1]} users={[this.props.kit1,this.props.kit2]} compare={[[kitsCompared, raw, 0]]} useParent={this.props.useParent}/> 
+                   );
+        } 
         
         else {
             return <div></div>
@@ -326,9 +338,9 @@ var AssumedAncestryOverlay = React.createClass({
         var rectWidth = canvaswidth;
         var rectHeight = yscale * this.props.list[0];
         var xpos = 0;
-        var ypos = (rowheight + 6) * this.props.rownumber;
+        var ypos = 0;
         var dadstyle = overlaystyle(xpos, ypos, rectHeight, rectWidth, 10, '#407dbf', 'lightblue');
-        ypos = (rowheight + 6) * this.props.rownumber + rectHeight;
+        ypos = rectHeight;
         rectHeight = yscale * this.props.list[1];
         var mumstyle = overlaystyle(xpos, ypos, rectHeight, rectWidth, 10, '#ff8080', 'red');
         return (

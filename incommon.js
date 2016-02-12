@@ -55,3 +55,19 @@ function findAllIncommon(name) {
     }
     return result;
 }
+
+function getExclusionList(kitname) {
+    var exclusionList = [];
+    var relationInfo = findRelation(kitname);
+    if (relationInfo.father != "")
+        exclusionList[exclusionList.length] = relationInfo.father;
+    if (relationInfo.mother != "")
+        exclusionList[exclusionList.length] = relationInfo.mother;
+    
+    var allRelations = getRelations();
+    for (var rel in allRelations) {
+        if (allRelations[rel].father == kitname || allRelations[rel].mother == kitname)
+            exclusionList[exclusionList.length] = allRelations[rel].name;
+    }
+    return exclusionList;
+}
