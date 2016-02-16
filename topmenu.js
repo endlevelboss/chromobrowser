@@ -7,13 +7,13 @@ var MainWindow = React.createClass({
     },
     handleButtonBrowser: function() {
         this.setState({content: <BrowserHandler kits={this.props.kits} />
-                      } 
+                      }
                      );
     },
     handleButtonRelation: function() {
         this.setState({content: <RelationsHandler />
                        ,
-                      } 
+                      }
                        );
     },
     handleButtonData: function() {
@@ -35,17 +35,9 @@ var MainWindow = React.createClass({
             <button onClick={this.handleButtonData}>Kits</button>
             <button onClick={this.handleButtonFile}>File</button>
             </div>
-            
+
             {this.state.content}
             </div>
         );
     }
 });
-            
-function redraw() {
-    React.render(
-        <MainWindow kits={kits} />, document.getElementById('main')
-    )
-};
-
-redraw();

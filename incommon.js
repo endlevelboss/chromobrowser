@@ -32,12 +32,14 @@ function addInCommonMatch(name, kitname, matchname, continueLoop) {
 }
 
 function findByNameIncommon(name, data) {
+  if (data !== null) {
     for (var i = 0; i < data.length; i++){
         if (data[i].name == name){
             return data[i];
         }
     }
-    return null;
+  }
+  return null;
 }
 
 function findAllIncommon(name) {
@@ -50,7 +52,7 @@ function findAllIncommon(name) {
                if(result.indexOf(incommon.name) < 0) {
                    result[result.length] = incommon.name;
                }
-           }) 
+           })
         });
     }
     return result;
@@ -59,11 +61,14 @@ function findAllIncommon(name) {
 function getExclusionList(kitname) {
     var exclusionList = [];
     var relationInfo = findRelation(kitname);
-    if (relationInfo.father != "")
+    if (relationInfo != null) {
+    if (relationInfo.father != ""){
         exclusionList[exclusionList.length] = relationInfo.father;
-    if (relationInfo.mother != "")
+      }
+    if (relationInfo.mother != "") {
         exclusionList[exclusionList.length] = relationInfo.mother;
-    
+      }
+    }
     var allRelations = getRelations();
     for (var rel in allRelations) {
         if (allRelations[rel].father == kitname || allRelations[rel].mother == kitname)

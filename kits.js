@@ -78,10 +78,26 @@ var DataDisplay = React.createClass({
 });
 
 var KitSelector = React.createClass({
+  getInitialState: function () {
+    return({
+      kitlist: cm.kits,
+    })
+  },
+  componentDidMount: function () {
+    cm.registerCallback(this);
+  },
+  componentWillUnmount: function () {
+    cm.unregisterCallback(this);
+  },
+  update: function () {
+    this.setState({
+      kitlist: cm.kits,
+    })
+  },
     render: function() {
         var options =null;
-        if (this.props.kitlist != null) {
-            options = this.props.kitlist.map( function(kit, index) {
+        if (this.state.kitlist != null) {
+            options = this.state.kitlist.map( function(kit, index) {
                 return <option key={kit.name} value={kit.name}>{kit.name}</option>;
             });
         }
@@ -94,4 +110,3 @@ var KitSelector = React.createClass({
         );
     }
 });
-

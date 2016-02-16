@@ -1,24 +1,21 @@
 function sortChromodata(myowner, selectedChromosome){
-    var exclusionlist = getExclusionList(myowner.name);
-    
     var mydata = [];
     if (myowner != null) {
-    
-    for (var i in myowner.matches){
-        
-        if (exclusionlist.indexOf(myowner.matches[i].name) < 0) {
-            for (var j in myowner.matches[i].matchblocks) {
-                var currentData = myowner.matches[i].matchblocks[j];
+      var exclusionlist = getExclusionList(myowner.name);
+      for (var i in myowner.matches){
+          if (exclusionlist.indexOf(myowner.matches[i].name) < 0) {
+              for (var j in myowner.matches[i].matchblocks) {
+                  var currentData = myowner.matches[i].matchblocks[j];
 
-                if (currentData.chromo == selectedChromosome && Number(currentData.lngth) >= Number(selectedLimit)) {
-                    mydata[mydata.length] = new Data(currentData.match, currentData.chromo, currentData.start, currentData.end, currentData.lngth, currentData.snp);
-                }
-            }
-        }
-    }
-    mydata.sort(function (a, b) {
-        return Number(a.start) - Number(b.start);
-    })
+                  if (currentData.chromo == selectedChromosome && Number(currentData.lngth) >= Number(selectedLimit)) {
+                      mydata[mydata.length] = new Data(currentData.match, currentData.chromo, currentData.start, currentData.end, currentData.lngth, currentData.snp);
+                  }
+              }
+          }
+      }
+      mydata.sort(function (a, b) {
+          return Number(a.start) - Number(b.start);
+      });
     }
     return mydata;
 }
@@ -27,11 +24,11 @@ function getHeritageMap(kitname) {
     var kitBox = findRelation(kitname);
     var father = findRelation(kitBox.father);
     var mother = findRelation(kitBox.mother);
-    
+
     var viaDad = false;
     var viaMum = false;
     var mymap = [];
-    
+
     var personBoxes = getRelations();
     for (var j in personBoxes) {
         viaDad = traceAncestor(father, personBoxes[j].name);
@@ -212,7 +209,7 @@ function setAncestry(matchname, ancestryname) {
     var match = setMatch(matchname);
     setCustomdata(match, 'relation', ancestryname);
 }
-    
+
 function setCustomdata(match, type, value) {
     for (var i = 0; i < match.customdata.length; i++) {
         if (match.customdata[i].type == type) {
@@ -318,9 +315,9 @@ function compareRaw(rawA, rawB) {
 function sortRawdata(selectedPerson, selectedChromosome) {
     //console.log(kitRawdata);
     var myraw = [];
-    for (var j = 0; j < kitRawdata.length; j++) {
-        if(kitRawdata[j].name == selectedPerson) {
-            myraw = kitRawdata[j].data;
+    for (var j = 0; j < cm.kitRawdata.length; j++) {
+        if(cm.kitRawdata[j].name == selectedPerson) {
+            myraw = cm.kitRawdata[j].data;
         }
     }
     var mydata = [];

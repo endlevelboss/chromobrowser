@@ -32,8 +32,8 @@ var FileHandler = React.createClass({
             Choose chromosome data files to import: <br/>
             <input type="file" multiple onChange={this.importCBdata} />
             <h1>{this.state.files}</h1>
-            
-            <KitSelector onChange={this.kitChanged} kitlist={this.props.kits} />
+
+            <KitSelector onChange={this.kitChanged}/>
             <input type="file" onChange={this.importRawData} />
             </div>
         );
@@ -61,8 +61,9 @@ function readfile(file, filenumber) {
             currentKit = testLines(result[i], currentKit);
         }
         fileCount++;
-        kits[kits.length] = currentKit; // saving data in memory
-        
+        cm.kits.push(currentKit);
+        // kits[kits.length] = currentKit; // saving data in memory
+
         var transaction = db.transaction(["kits"], "readwrite");
         var store = transaction.objectStore("kits");
         var index = store.index('name');
@@ -106,7 +107,7 @@ function addChromodata(namearray, dataarray, kit) {
     kit = updatePerson(namearray[0], kit);
     // finner matchnavn, lager ny match hvis ikke eksisterer
     var mymatch = checkMatch(namearray[1], kit);
-    var mydata = checkData(mymatch, dataarray, kit); 
+    var mydata = checkData(mymatch, dataarray, kit);
     // sjekker om blokken allerede er lagret, legger til paa match om den ikke er det
     return kit;
 }
@@ -146,15 +147,16 @@ function rawFileReader(file, kitname){
                 parsedFile[parsedFile.length] = parsed;
             }
         }
-        
+
         console.log('about to store data');
         console.log(kitname);
-        
+
         if (kitname != null) {
             var value = {
                 name: kitname,
                 data: parsedFile
             };
+            cm.addRawdata(value);
             var transaction = db.transaction(["raw"], "readwrite");
             var store = transaction.objectStore("raw");
             var index = store.index('name');

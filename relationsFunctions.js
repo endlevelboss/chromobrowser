@@ -10,7 +10,7 @@ function RelationBox(name) {
 
 function getRelations() {
     var relations = getUserdata('relations');
-    kits.map(function(kit) {
+    cm.kits.map(function(kit) {
         addRelation(kit.name);
     });
     return relations;
@@ -45,4 +45,3 @@ function updateRelation(child, parent, isFather) {
         }
     }
 }
-    
