@@ -44,7 +44,7 @@ function findByNameIncommon(name, data) {
 
 function findAllIncommon(name) {
     var result = [];
-    var userdata = getUserdata('incommon');
+    var userdata = cm.getUserdata('incommon');
     var match = findByNameIncommon(name, userdata);
     if (match != null) {
         match.data.map(function(item){

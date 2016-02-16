@@ -8,7 +8,7 @@ var RelationsHandler = React.createClass({
         }
     },
     setDragging: function(param, sender, isFather) {
-        this.setState( { 
+        this.setState( {
             relationDragging: param,
             child: sender,
             isFather: isFather,
@@ -18,7 +18,7 @@ var RelationsHandler = React.createClass({
     onMouseUp: function(e) {
         if (this.state.relationDragging) {
             this.setState({relationDragging: false});
-        }   
+        }
     },
     mouseOver: function(param) {
         updateRelation(this.state.child, param, this.state.isFather);
@@ -104,7 +104,7 @@ var Draggable = React.createClass({
         xpos: this.props.xpos,
         ypos: this.props.ypos,
         dragging: false,
-        xrel: null, 
+        xrel: null,
         yrel: null,
         color: this.props.myref.color,
     }
@@ -130,7 +130,7 @@ var Draggable = React.createClass({
   },
   onMouseUp: function (e) {
     this.setState({dragging: false})
-    
+
     e.stopPropagation()
     e.preventDefault()
   },

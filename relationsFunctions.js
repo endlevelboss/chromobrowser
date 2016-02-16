@@ -9,15 +9,16 @@ function RelationBox(name) {
 }
 
 function getRelations() {
-    var relations = getUserdata('relations');
     cm.kits.map(function(kit) {
         addRelation(kit.name);
     });
+    var relations = cm.getUserdata('relations');
+    console.log(cm.userdata);
     return relations;
 }
 
 function addRelation(name) {
-    var relations = getUserdata('relations');
+    var relations = cm.getUserdata('relations');
     for (var i = 0; i< relations.length; i++) {
         if (relations[i].name == name)
             return;
@@ -26,7 +27,8 @@ function addRelation(name) {
 }
 
 function findRelation(name) {
-    var relations = getUserdata('relations');
+  console.log(cm.userdata);
+    var relations = cm.getUserdata('relations');
     for (var i = 0; i< relations.length; i++) {
         if (relations[i].name == name) {
             return relations[i];

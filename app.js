@@ -58,6 +58,11 @@ function onDocumentReady() {
 
 // Reads indexedDB to memory
 function onStartup() {
+  loadLocalstorage();
+  initializeUserdata();
+
+  console.log(cm.userdata);
+
     var transaction = db.transaction(['kits'], "readonly");
     var store = transaction.objectStore('kits');
     var cursor = store.openCursor();
@@ -67,8 +72,7 @@ function onStartup() {
             cm.addKit(res.value);
             res.continue();
         } else {
-            loadLocalstorage();
-            initializeUserdata();
+
             var transaction = db.transaction(["raw"], "readonly");
             var storeRaw = transaction.objectStore('raw');
             var cursorRaw = storeRaw.openCursor();

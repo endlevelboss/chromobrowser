@@ -233,7 +233,7 @@ function getCustomdata(match, type) {
 }
 
 function setMatch(matchname) {
-    var matches = getUserdata('matches');
+    var matches = cm.getUserdata('matches');
     for (var i=0; i<matches.length; i++) {
         if (matches[i].name == matchname)
             return matches[i];
@@ -244,7 +244,7 @@ function setMatch(matchname) {
 }
 
 function getMatch(matchname) {
-    var matches = getUserdata('matches');
+    var matches = cm.getUserdata('matches');
     for (var i=0; i<matches.length; i++) {
         if (matches[i].name == matchname)
             return matches[i];

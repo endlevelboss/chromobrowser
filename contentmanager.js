@@ -31,6 +31,27 @@ class DatabaseManager {
 
   }
 
+  getUserdata(type) {
+    for (var i = 0; i < cm.userdata.length; i++) {
+      if (cm.userdata[i].type === type) {
+        return cm.userdata[i];
+      }
+    }
+    return null;
+  }
+
+  setUserdata(type, data) {
+    var found = null;
+    for (var i = 0; i < cm.userdata.length; i++) {
+      if (cm.userdata[i].type === type) {
+        found = cm.userdata[i];
+      }
+    }
+    if (found == null) {
+      cm.userdata.push(new Userdata(type,data));
+    }
+  }
+
   registerCallback(cbFunction) {
     this.callbacks.push(cbFunction);
   }
@@ -77,16 +98,16 @@ class DatabaseManager {
     this.kitRawdata.push(raw);
     this.update();
   }
-
-  setUserdata(data) {
-    this.userdata = data;
-    this.update();
-  }
-
-  addUserdata(data) {
-    this.userdata.push(data);
-    this.update();
-  }
+  //
+  // setUserdata(data) {
+  //   this.userdata = data;
+  //   this.update();
+  // }
+  //
+  // addUserdata(data) {
+  //   this.userdata.push(data);
+  //   this.update();
+  // }
   getKit(name) {
       for (var i = 0; i < cm.kits.length; i++) {
           if (cm.kits[i].name === name) {
