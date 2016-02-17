@@ -95,7 +95,7 @@ window.onbeforeunload = function (e) {
 function loadLocalstorage() {
     var chromobrowserdata = localStorage.chromobrowser;
     if (chromobrowserdata != undefined) {
-      cm.setUserdata(JSON.parse(chromobrowserdata));
+      cm.replaceAllUserdata(JSON.parse(chromobrowserdata));
         // userdata = JSON.parse(chromobrowserdata);
     }
 }

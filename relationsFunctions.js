@@ -13,22 +13,21 @@ function getRelations() {
         addRelation(kit.name);
     });
     var relations = cm.getUserdata('relations');
-    console.log(cm.userdata);
-    return relations;
+    return relations.data;
 }
 
 function addRelation(name) {
-    var relations = cm.getUserdata('relations');
+    var relations = cm.getUserdataData('relations');
     for (var i = 0; i< relations.length; i++) {
         if (relations[i].name == name)
             return;
     }
+    // cm.addUserdata('relations', new RelationBox(name));
     relations[relations.length] = new RelationBox(name);
 }
 
 function findRelation(name) {
-  console.log(cm.userdata);
-    var relations = cm.getUserdata('relations');
+    var relations = cm.getUserdataData('relations');
     for (var i = 0; i< relations.length; i++) {
         if (relations[i].name == name) {
             return relations[i];

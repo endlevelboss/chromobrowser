@@ -83,7 +83,7 @@ function checkColumnList(datalist, isParentsChecked, kitname) {
         var unknownmatches = [];
         var unknowncolumns = [];
         for (var i in datalist) {
-            var match = getMatch(datalist[i].match);
+            var match = cm.getMatch(datalist[i].match);
             var heritage = getCustomdata(match, 'relation');
             if (heritage != null) {
                 var myheritage = findCommonLineage(kitname, heritage);
@@ -205,20 +205,7 @@ function Customdata(type, data) {
     this.data = data;
 }
 
-function setAncestry(matchname, ancestryname) {
-    var match = setMatch(matchname);
-    setCustomdata(match, 'relation', ancestryname);
-}
 
-function setCustomdata(match, type, value) {
-    for (var i = 0; i < match.customdata.length; i++) {
-        if (match.customdata[i].type == type) {
-            match.customdata[i].data = value;
-            return;
-        }
-    }
-    match.customdata[match.customdata.length] = new Customdata(type, value);
-}
 
 function getCustomdata(match, type) {
     var value = null;
@@ -232,28 +219,10 @@ function getCustomdata(match, type) {
     return value;
 }
 
-function setMatch(matchname) {
-    var matches = cm.getUserdata('matches');
-    for (var i=0; i<matches.length; i++) {
-        if (matches[i].name == matchname)
-            return matches[i];
-    }
-    var newmatch = new MatchCustom(matchname);
-    matches[matches.length] = newmatch;
-    return newmatch;
-}
 
-function getMatch(matchname) {
-    var matches = cm.getUserdata('matches');
-    for (var i=0; i<matches.length; i++) {
-        if (matches[i].name == matchname)
-            return matches[i];
-    }
-    return null;
-}
 
 function getRelationColor(matchname) {
-    var match = getMatch(matchname);
+    var match = cm.getMatch(matchname);
     if (match != null) {
         var relationName = getCustomdata(match, 'relation');
         if (relationName != null) {

@@ -79,8 +79,8 @@ var BrowserHandler = React.createClass({
 
 var MatchInfo = React.createClass({
     change: function(e) {
-        setAncestry(this.props.matchname, e.target.value);
-        this.props.update();
+        cm.setAncestry(this.props.matchname, e.target.value);
+        //this.props.update();
     },
     render: function() {
         var relations = getRelations();
@@ -317,6 +317,22 @@ var AssumedAncestryOverlay = React.createClass({
 
 
 var MatchBlock = React.createClass({
+  getInitialState: function () {
+      return({
+        mycolor: getRelationColor(this.props.matchdata.match),
+      });
+  },
+  componentDidMount: function () {
+    cm.registerCallback(this);
+  },
+  componentWillUnmount: function () {
+    cm.unregisterCallback(this);
+  },
+  update: function () {
+    this.setState({
+      mycolor: getRelationColor(this.props.matchdata.match),
+    });
+  },
   onClick: function (e) {
     cm.setSelectedMatch(this.props.matchdata.match);
     e.stopPropagation();
@@ -343,7 +359,7 @@ var MatchBlock = React.createClass({
         var rectWidth = (this.props.matchdata.end - this.props.matchdata.start) * scale - 2;
         var rectHeight = yscale - 2;
 
-        var mycolor = getRelationColor(this.props.matchdata.match);
+        // var mycolor = getRelationColor(this.props.matchdata.match);
         if (this.props.incommon.indexOf(this.props.matchdata.match) > -1) {
             var kitnames = kits.map(function(kit){ return kit.name; });
             if (kitnames.indexOf(this.props.matchdata.match) < 0) {
@@ -351,7 +367,7 @@ var MatchBlock = React.createClass({
             }
         }
 
-        var matchblockStyle = matchstyle(xpos, ypos, rectHeight, rectWidth, mycolor);
+        var matchblockStyle = matchstyle(xpos, ypos, rectHeight, rectWidth, this.state.mycolor);
         return(
             <div style={matchblockStyle} value={this.props.matchdata.match} onClick={this.onClick}>
             <label className={'unselectable'} value={this.props.matchdata.match} onClick={this.onClick}>{this.props.matchdata.match}</label>

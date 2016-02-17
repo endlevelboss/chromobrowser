@@ -5,7 +5,19 @@ var RelationsHandler = React.createClass({
             isFather: true,
             child: null,
             textvalue: '',
+            relations: cm.getUserdataData('relations'),
         }
+    },
+    componentDidMount: function () {
+      cm.registerCallback(this);
+    },
+    componentWillUnmount: function () {
+      cm.unregisterCallback(this);
+    },
+    update: function () {
+      this.setState({
+        relations: cm.getUserdataData('relations'),
+      })
     },
     setDragging: function(param, sender, isFather) {
         this.setState( {
@@ -28,7 +40,7 @@ var RelationsHandler = React.createClass({
         updateRelation(this.state.child, '', this.state.isFather);
         var parent = this.state.isFather?'father':'mother';
     },
-    update: function() {
+    updateDrawing: function() {
         this.forceUpdate();
     },
     textChange: function(event) {
@@ -41,22 +53,20 @@ var RelationsHandler = React.createClass({
         }
     },
     render: function() {
-        var relations = getRelations();
         var content = null;
         var drawer = null;
         var isRelDragging = this.state.relationDragging;
         var mouseOver = this.mouseOver;
         var setDrag = this.setDragging;
         var del = this.deleteRelation;
-        var update = this.update;
-        if (relations != null) {
-            content = relations.map( function(rel) {
-                var index = relations.indexOf(rel);
-                return( <Draggable myref={rel} key={rel.name} name={rel.name} xpos={rel.xpos} ypos={rel.ypos} drag={setDrag} mouseOver={mouseOver} isRelDragging={isRelDragging} update={update} deleteRelation={del} />
+        var updateDrawing = this.updateDrawing;
+        if (this.state.relations != null) {
+            content = this.state.relations.map( function(rel, index) {
+                return( <Draggable myref={rel} key={index} name={rel.name} xpos={rel.xpos} ypos={rel.ypos} drag={setDrag} mouseOver={mouseOver} isRelDragging={isRelDragging} update={updateDrawing} deleteRelation={del} />
                       );
                        }.bind(this)
                                               );
-            drawer = <Drawer relations={relations} />
+            drawer = <Drawer relations={this.state.relations} />
         }
         var textvalue = this.state.textvalue;
         return(

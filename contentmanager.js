@@ -30,27 +30,96 @@ class DatabaseManager {
     this.comparisons = []; // stores comparisons between kits
 
   }
+  setAncestry(matchname, ancestryname) {
+      var match = this.setMatch(matchname);
+      this.setCustomdata(match, 'relation', ancestryname);
+      this.update();
+  }
+
+  setCustomdata(match, type, value) {
+      for (var i = 0; i < match.customdata.length; i++) {
+          if (match.customdata[i].type == type) {
+              match.customdata[i].data = value;
+              return;
+          }
+      }
+      match.customdata[match.customdata.length] = new Customdata(type, value);
+  }
+
+  setMatch(matchname) {
+      var matches = this.getUserdataData('matches');
+      for (var i=0; i < matches.length; i++) {
+          if (matches[i].name == matchname)
+              return matches[i];
+      }
+      var newmatch = new MatchCustom(matchname);
+      matches[matches.length] = newmatch;
+      return newmatch;
+  }
+
+  getMatch(matchname) {
+      var matches = this.getUserdataData('matches');
+      for (var i=0; i<matches.length; i++) {
+          if (matches[i].name == matchname)
+              return matches[i];
+      }
+      return null;
+  }
 
   getUserdata(type) {
-    for (var i = 0; i < cm.userdata.length; i++) {
-      if (cm.userdata[i].type === type) {
-        return cm.userdata[i];
+    for (var i = 0; i < this.userdata.length; i++) {
+      if (this.userdata[i].type === type) {
+        return this.userdata[i];
       }
     }
     return null;
   }
 
-  setUserdata(type, data) {
+  getUserdataData(type) {
+    for (var i = 0; i < this.userdata.length; i++) {
+      if (this.userdata[i].type === type) {
+        return this.userdata[i].data;
+      }
+    }
+    return null;
+  }
+
+  initializeUserdata(type, data) {
     var found = null;
-    for (var i = 0; i < cm.userdata.length; i++) {
-      if (cm.userdata[i].type === type) {
-        found = cm.userdata[i];
+    for (var i = 0; i < this.userdata.length; i++) {
+      if (this.userdata[i].type === type) {
+        found = this.userdata[i];
       }
     }
     if (found == null) {
-      cm.userdata.push(new Userdata(type,data));
+      this.userdata.push(new Userdata(type,data));
     }
   }
+
+  addUserdataDeprecated(type, data) {
+    // for (var i = 0; i < this.userdata.length; i++) {
+    //   if (this.userdata[i].type === type) {
+    //     for (var j = 0; j < this.userdata[i].data.length) {
+    //
+    //     }
+    //     this.userdata[i].data.push(data);
+    //   }
+    // }
+  }
+
+  replaceUserdata(type, data) {
+    for (var i = 0; i < this.userdata.length; i++) {
+      if (this.userdata[i].type === type) {
+        this.userdata[i].data = data;
+      }
+    }
+  }
+
+  replaceAllUserdata(data) {
+    this.userdata = data;
+  }
+
+
 
   registerCallback(cbFunction) {
     this.callbacks.push(cbFunction);
