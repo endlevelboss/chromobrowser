@@ -10,7 +10,7 @@ function addInCommon(kitname, matchname, namelist) {
 }
 
 function addInCommonMatch(name, kitname, matchname, continueLoop) {
-    var userdata = getUserdata('incommon');
+    var userdata = cm.getUserdataData('incommon');
     var match = findByNameIncommon(matchname, userdata);
     if (match == null) {
         match = new MatchData(matchname);
@@ -44,7 +44,7 @@ function findByNameIncommon(name, data) {
 
 function findAllIncommon(name) {
     var result = [];
-    var userdata = cm.getUserdata('incommon');
+    var userdata = cm.getUserdataData('incommon');
     var match = findByNameIncommon(name, userdata);
     if (match != null) {
         match.data.map(function(item){

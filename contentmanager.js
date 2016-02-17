@@ -195,6 +195,7 @@ class DatabaseManager {
     }
 
     this.inCommonWithSelectedMatch = findAllIncommon(this.selectedMatch);
+    
     var kit1 = this.getKit(this.selectedKits[1]);
     var kit2 = this.getKit(this.selectedKits[2]);
     var kit3 = this.getKit(this.selectedKits[3]);

@@ -3,10 +3,10 @@ var DataHandler = React.createClass({
         var initValue = null;
         var selectedKit = null;
         var selectedMatch = null;
-        if (kits.length > 0) {
-            selectedKit = kits[0].name;
-            selectedMatch = setDefaultMatch(kits[0].matches);
-            initValue = kits[0].matches;
+        if (cm.kits.length > 0) {
+            selectedKit = cm.kits[0].name;
+            selectedMatch = setDefaultMatch(cm.kits[0].matches);
+            initValue = cm.kits[0].matches;
         }
         return { selection: initValue,
                  matchselection: null,
@@ -18,9 +18,11 @@ var DataHandler = React.createClass({
         if(e.target != null) {
             var matches = getKit(e.target.value).matches
             var selectedMatch = setDefaultMatch(matches);
-            this.setState({selection: matches,
-                          selectedKit: e.target.value,
-                          selectedMatch: selectedMatch});
+            this.setState({
+              selection: matches,
+              selectedKit: e.target.value,
+              selectedMatch: selectedMatch,
+            });
         }
     },
     clickMatch: function(e) {
@@ -40,7 +42,7 @@ var DataHandler = React.createClass({
             <div>
                 <div style={styles.dataview} >
                 Kit: <br/>
-                <KitSelector onChange={this.handleChange} kitlist={this.props.kits}/>
+                <KitSelector onChange={this.handleChange}/>
                 Matches: <br/>
                 <KitSelector onChange={this.clickMatch} kitlist={this.state.selection} />
                 Choose In Common file to import: <br/>
@@ -95,9 +97,13 @@ var KitSelector = React.createClass({
     })
   },
     render: function() {
-        var options =null;
-        if (this.state.kitlist != null) {
-            options = this.state.kitlist.map( function(kit, index) {
+        var options = null;
+        var mylist = this.state.kitlist;
+        if (this.props.kitlist != null) {
+          mylist = this.props.kitlist;
+        }
+        if (mylist != null) {
+            options = mylist.map( function(kit, index) {
                 return <option key={kit.name} value={kit.name}>{kit.name}</option>;
             });
         }

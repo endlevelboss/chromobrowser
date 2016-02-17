@@ -243,7 +243,7 @@ var MatchBlocks = React.createClass({
       useParent: cm.useParentCheckbox,
       chromoIndex: cm.selectedChromoIndex,
       chromosome: cm.selectedChromosome,
-      incommon: cm.inCommonWithSelectedMatch,
+      // incommon: cm.inCommonWithSelectedMatch,
     });
   },
   componentDidMount: function () {
@@ -257,7 +257,7 @@ var MatchBlocks = React.createClass({
       useParent: cm.useParentCheckbox,
       chromoIndex: cm.selectedChromoIndex,
       chromosome: cm.selectedChromosome,
-      incommon: cm.inCommonWithSelectedMatch,
+      // incommon: cm.inCommonWithSelectedMatch,
     });
   },
     render: function() {
@@ -267,9 +267,10 @@ var MatchBlocks = React.createClass({
           var chromosome = this.state.chromoIndex;
           var rows = this.props.rows;
           var rownumber = this.props.rownumber;
+          // var incommon = this.state.incommon;
           if (this.props.matchdata != null) {
               content = this.props.matchdata.map( function(data) {
-                  return( <MatchBlock key={data.match + data.chromo + data.start} chromoIndex={chromosome} matchdata={data} columnlist={clist} rows={rows} rownumber={rownumber} incommon={this.state.incommon}/>
+                  return( <MatchBlock key={data.match + data.chromo + data.start} chromoIndex={chromosome} matchdata={data} columnlist={clist} rows={rows} rownumber={rownumber} />
                         );
                          }.bind(this)
             );
@@ -318,9 +319,20 @@ var AssumedAncestryOverlay = React.createClass({
 
 var MatchBlock = React.createClass({
   getInitialState: function () {
-      return({
-        mycolor: getRelationColor(this.props.matchdata.match),
-      });
+    var color = this.getColor();
+    return({
+      mycolor: color,
+    });
+  },
+  getColor: function () {
+    var color = getRelationColor(this.props.matchdata.match);
+    if ( cm.inCommonWithSelectedMatch.indexOf(this.props.matchdata.match) > -1) {
+        var kitnames = cm.kits.map(function(kit){ return kit.name; });
+        if (kitnames.indexOf(this.props.matchdata.match) < 0) {
+            color = 'lightgreen';
+        }
+    }
+    return color;
   },
   componentDidMount: function () {
     cm.registerCallback(this);
@@ -329,8 +341,9 @@ var MatchBlock = React.createClass({
     cm.unregisterCallback(this);
   },
   update: function () {
+    var color = this.getColor();
     this.setState({
-      mycolor: getRelationColor(this.props.matchdata.match),
+      mycolor: color,
     });
   },
   onClick: function (e) {
@@ -338,41 +351,35 @@ var MatchBlock = React.createClass({
     e.stopPropagation();
   },
     render: function() {
-        var columns = 0;
-        var numOfRows = this.props.rows;
-        for (var colcount = 0; colcount < this.props.columnlist.length; colcount++) {
-            columns = columns + this.props.columnlist[colcount];
-        }
+      var columns = 0;
+      var numOfRows = this.props.rows;
+      for (var colcount = 0; colcount < this.props.columnlist.length; colcount++) {
+          columns = columns + this.props.columnlist[colcount];
+      }
 
-        var rowheight = (canvasheight - 50 - 6 * (numOfRows - 1)) / numOfRows;
-        var yscale = (canvasheight - 50 - 6 * (numOfRows - 1)) / (columns * numOfRows);
-        var scale = (canvaswidth - 50) / chromolength[this.props.chromoIndex];
+      var rowheight = (canvasheight - 50 - 6 * (numOfRows - 1)) / numOfRows;
+      var yscale = (canvasheight - 50 - 6 * (numOfRows - 1)) / (columns * numOfRows);
+      var scale = (canvaswidth - 50) / chromolength[this.props.chromoIndex];
 
-        var parentadjustment = 0;
-        for (var i = 0; i < this.props.matchdata.bigcolumn; i++) {
-            parentadjustment += this.props.columnlist[i] * yscale;
-        }
+      var parentadjustment = 0;
+      for (var i = 0; i < this.props.matchdata.bigcolumn; i++) {
+          parentadjustment += this.props.columnlist[i] * yscale;
+      }
 
-        var xpos = Number(this.props.matchdata.start) * scale + 50;
-        var ypos = yscale * this.props.matchdata.column + 25 + (rowheight + 6) * this.props.rownumber + parentadjustment;
+      var xpos = Number(this.props.matchdata.start) * scale + 50;
+      var ypos = yscale * this.props.matchdata.column + 25 + (rowheight + 6) * this.props.rownumber + parentadjustment;
 
-        var rectWidth = (this.props.matchdata.end - this.props.matchdata.start) * scale - 2;
-        var rectHeight = yscale - 2;
+      var rectWidth = (this.props.matchdata.end - this.props.matchdata.start) * scale - 2;
+      var rectHeight = yscale - 2;
 
-        // var mycolor = getRelationColor(this.props.matchdata.match);
-        if (this.props.incommon.indexOf(this.props.matchdata.match) > -1) {
-            var kitnames = kits.map(function(kit){ return kit.name; });
-            if (kitnames.indexOf(this.props.matchdata.match) < 0) {
-                mycolor = 'lightgreen';
-            }
-        }
+      // var mycolor = getRelationColor(this.props.matchdata.match);
 
-        var matchblockStyle = matchstyle(xpos, ypos, rectHeight, rectWidth, this.state.mycolor);
-        return(
-            <div style={matchblockStyle} value={this.props.matchdata.match} onClick={this.onClick}>
-            <label className={'unselectable'} value={this.props.matchdata.match} onClick={this.onClick}>{this.props.matchdata.match}</label>
-            </div>
-        );
+      var matchblockStyle = matchstyle(xpos, ypos, rectHeight, rectWidth, this.state.mycolor);
+      return(
+          <div style={matchblockStyle} value={this.props.matchdata.match} onClick={this.onClick}>
+          <label className={'unselectable'} value={this.props.matchdata.match} onClick={this.onClick}>{this.props.matchdata.match}</label>
+          </div>
+      );
     }
 });
 

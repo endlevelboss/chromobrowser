@@ -61,6 +61,9 @@ function readfile(file, filenumber) {
             currentKit = testLines(result[i], currentKit);
         }
         fileCount++;
+
+        // TODO: fix so we dont get duplicates in kits, must check if kit is already present
+        // and only needs an update 
         cm.kits.push(currentKit);
         // kits[kits.length] = currentKit; // saving data in memory
 
