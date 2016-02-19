@@ -7,11 +7,25 @@ class DatabaseManager {
     this.kitRawdata = []; // Contains raw autosomal
     this.userdata = []; // Contains all user data
 
+    this.canvasheight;
+    this.canvaswidth;
+    this.setCanvas();
+    this.comparisonHeight = 8; // height in px of small comparison window
+    this.xoffset = 10;
+    this.xinneroffset = 25; // chromobackground with 25px padding front and back
+    this.yoffset = 25;
+
+    this.markerPosition = 0;
+
     // Array of callback functions for all registered listeners
     this.callbacks = [];
 
     this.selectedChromosome = '1'; // Name of selected chromosome
     this.selectedChromoIndex = 0;  // Index of selected chromosome
+
+    this.scale = this.getScale();
+
+    this.selectedCMLimit = 5;
 
     this.displaymode = 'A'; // Viewselection, defaulting to single user
 
@@ -30,6 +44,21 @@ class DatabaseManager {
     this.comparisons = []; // stores comparisons between kits
 
   }
+
+  getScale() {
+    return this.canvaswidth / chromolength[this.selectedChromoIndex];
+  }
+
+  setCanvas() {
+    this.canvasheight = window.innerHeight - 100;
+    this.canvaswidth = window.innerWidth - 90;
+  }
+
+  updateCanvas() {
+    this.setCanvas();
+    this.update();
+  }
+
   setAncestry(matchname, ancestryname) {
       var match = this.setMatch(matchname);
       this.setCustomdata(match, 'relation', ancestryname);
@@ -96,17 +125,6 @@ class DatabaseManager {
     }
   }
 
-  addUserdataDeprecated(type, data) {
-    // for (var i = 0; i < this.userdata.length; i++) {
-    //   if (this.userdata[i].type === type) {
-    //     for (var j = 0; j < this.userdata[i].data.length) {
-    //
-    //     }
-    //     this.userdata[i].data.push(data);
-    //   }
-    // }
-  }
-
   replaceUserdata(type, data) {
     for (var i = 0; i < this.userdata.length; i++) {
       if (this.userdata[i].type === type) {
@@ -130,6 +148,11 @@ class DatabaseManager {
     if (i > -1) {
       this.callbacks[i] = null; // sets element to null, will be removed in update function
     }
+  }
+
+  setCMLimit(value) {
+    this.selectedCMLimit = value;
+    this.update();
   }
 
   setSelectedMatch(value) {
@@ -167,16 +190,67 @@ class DatabaseManager {
     this.kitRawdata.push(raw);
     this.update();
   }
-  //
-  // setUserdata(data) {
-  //   this.userdata = data;
-  //   this.update();
-  // }
-  //
-  // addUserdata(data) {
-  //   this.userdata.push(data);
-  //   this.update();
-  // }
+
+  setMarkerPosition(pos) {
+    this.markerPosition = pos;
+  }
+
+  getCrossover(name, isFather) {
+    var data = [];
+    var crossoverdata = this.getUserdataData('crossovers');
+    var c = this.selectedChromosome;
+    crossoverdata.forEach(function (item) {
+      if (item.name == name) {
+        item.data.forEach(function (d) {
+          if (d.father == isFather && d.chromosome == c ) {
+            data.push(d);
+          }
+        });
+      }
+    });
+    return data;
+  }
+
+  setCrossover(rowid, isFather) {
+    var kitToModify = this.getKitnameFromRow(rowid);
+    var crossoverdata = this.getUserdataData('crossovers');
+    var kitdata = null;
+    crossoverdata.forEach( function (item) {
+      if (item.name == kitToModify) {
+        kitdata = item.data;
+      }
+    });
+    if (kitdata == null) {
+      kitdata = [];
+      kitdata.push({father: isFather, position: this.markerPosition, chromosome: this.selectedChromosome});
+      crossoverdata.push({name: kitToModify, data: kitdata});
+    } else {
+      kitdata.push({father: isFather, position: this.markerPosition, chromosome: this.selectedChromosome});
+    }
+    this.update();
+  }
+
+  getKitnameFromRow(rowid){
+    if (rowid == 1) {
+      if (this.displaymode == 'C') {
+        return this.selectedKits[1];
+      } else {
+        return this.selectedKits[2];
+      }
+    }
+    if (rowid == 2) {
+      return this.selectedKits[2];
+    }
+    if (rowid == 3) {
+      if (this.displaymode == 'C') {
+        return this.selectedKits[2];
+      } else {
+        return this.selectedKits[3];
+      }
+    }
+    return this.selectedKits[1];
+  }
+
   getKit(name) {
       for (var i = 0; i < cm.kits.length; i++) {
           if (cm.kits[i].name === name) {
@@ -194,8 +268,10 @@ class DatabaseManager {
       this.selectedKits[3] = this.kits[0].name;
     }
 
+    this.scale = this.getScale();
+
     this.inCommonWithSelectedMatch = findAllIncommon(this.selectedMatch);
-    
+
     var kit1 = this.getKit(this.selectedKits[1]);
     var kit2 = this.getKit(this.selectedKits[2]);
     var kit3 = this.getKit(this.selectedKits[3]);

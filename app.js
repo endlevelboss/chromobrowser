@@ -72,7 +72,7 @@ function onStartup() {
             cm.addKit(res.value);
             res.continue();
         } else {
-
+            cm.update();
             var transaction = db.transaction(["raw"], "readonly");
             var storeRaw = transaction.objectStore('raw');
             var cursorRaw = storeRaw.openCursor();
@@ -91,6 +91,10 @@ function onStartup() {
 window.onbeforeunload = function (e) {
     saveLocalstorage();
 }
+
+window.addEventListener("resize", function(e) {
+  cm.updateCanvas();
+}, false)
 
 function loadLocalstorage() {
     var chromobrowserdata = localStorage.chromobrowser;

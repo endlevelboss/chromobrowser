@@ -7,7 +7,7 @@ function sortChromodata(myowner, selectedChromosome){
               for (var j in myowner.matches[i].matchblocks) {
                   var currentData = myowner.matches[i].matchblocks[j];
 
-                  if (currentData.chromo == selectedChromosome && Number(currentData.lngth) >= Number(selectedLimit)) {
+                  if (currentData.chromo == selectedChromosome && Number(currentData.lngth) >= Number(cm.selectedCMLimit)) {
                       mydata[mydata.length] = new Data(currentData.match, currentData.chromo, currentData.start, currentData.end, currentData.lngth, currentData.snp);
                   }
               }

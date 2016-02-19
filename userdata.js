@@ -4,13 +4,20 @@ function Userdata(type, data) {
 }
 
 function initializeUserdata() {
-    var matches = cm.getUserdata('matches');
-    if (matches == null)
-        cm.initializeUserdata('matches',[]);
-    var matches = cm.getUserdata('incommon');
-    if (matches == null)
-        cm.initializeUserdata('incommon',[]);
-    var relations = cm.getUserdata('relations');
-    if (relations == null)
-        cm.initializeUserdata('relations',[]);
+  var matches = cm.getUserdata('matches');
+  if (matches == null){
+    cm.initializeUserdata('matches',[]);
+  }
+  var matches = cm.getUserdata('incommon');
+  if (matches == null) {
+    cm.initializeUserdata('incommon',[]);
+  }
+  var relations = cm.getUserdata('relations');
+  if (relations == null) {
+    cm.initializeUserdata('relations',[]);
+  }
+  var relations = cm.getUserdata('crossovers');
+  if (relations == null) {
+    cm.initializeUserdata('crossovers',[]);
+  }
 }
