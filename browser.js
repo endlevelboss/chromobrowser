@@ -314,12 +314,13 @@ var MatchBlocks = React.createClass({
         if (this.state.useParent) {
           var cxFather = cm.getCrossover(this.props.user.name, true);
           var cxMother = cm.getCrossover(this.props.user.name, false);
+          var name = this.props.user.name;
           cxFather.map(function (item, index) {
-            var cxButton = <CrossoverButton key={index} isFather={item.father} position={item.position} list={clist} rows={rows} rownumber={rownumber}/>
+            var cxButton = <CrossoverButton key={index} data={item} name={name} isFather={item.father} position={item.position} list={clist} rows={rows} rownumber={rownumber}/>
             crossovers.push(cxButton);
           })
           cxMother.map(function (item, index) {
-            var cxButton = <CrossoverButton key={index+'m'} isFather={item.father} position={item.position} list={clist} rows={rows} rownumber={rownumber}/>
+            var cxButton = <CrossoverButton key={index+'m'} data={item} name={name} isFather={item.father} position={item.position} list={clist} rows={rows} rownumber={rownumber}/>
             crossovers.push(cxButton);
           })
           // console.log(this.state.fatherCrossovers);
@@ -339,6 +340,9 @@ var CrossoverButton = React.createClass({
   getInitialState: function () {
     return({
       canvasheight: cm.canvasheight,
+      isDragging: false,
+      toBeDeleted: false,
+      position: this.props.position,
     });
   },
   componentDidMount: function () {
@@ -352,6 +356,44 @@ var CrossoverButton = React.createClass({
       canvasheight: cm.canvasheight,
     });
   },
+  onMouseDown: function (e) {
+    this.setState({
+      isDragging: true,
+      toBeDeleted: true,
+    })
+    e.stopPropagation();
+  },
+  onMouseUp: function (e) {
+    e.stopPropagation();
+    this.setState({
+      isDragging: false,
+    })
+    if (this.state.position != this.props.position) {
+      cm.editCrossover(this.props.data, this.state.position);
+    } else {
+      cm.deleteCrossover(this.props.data, this.props.name, this.props.isFather);
+    }
+  },
+  onMouseMove: function (e) {
+    if (this.state.isDragging){
+      this.setState({
+        position: e.pageX,
+      })
+    }
+    e.stopPropagation();
+  },
+  onMouseLeave: function (e) {
+    e.stopPropagation();
+    this.setState({
+      isDragging: false,
+    })
+    if (this.state.position != this.props.position) {
+      cm.editCrossover(this.props.data, this.state.position);
+    }
+  },
+  onMouseClick: function (e) {
+    e.stopPropagation();
+  },
   render: function () {
     var columns = 0;
     var numOfRows = this.props.rows;
@@ -360,20 +402,29 @@ var CrossoverButton = React.createClass({
           columns = columns + this.props.list[colcount];
       }
     }
-
     var rowheight = (this.state.canvasheight - cm.comparisonHeight * (numOfRows - 1)) / numOfRows;
     var yscale = (this.state.canvasheight - cm.comparisonHeight * (numOfRows - 1)) / (columns * numOfRows);
     var rectHeight1 = yscale * this.props.list[0];
     var rectHeight2 = yscale * this.props.list[1];
-    var yadjust = 0;
+    var yadjust = (rowheight + cm.comparisonHeight) * this.props.rownumber;
+    var lineheight = rectHeight1;
+    var linepos = cm.yoffset + (rowheight + cm.comparisonHeight) * this.props.rownumber;
     if (this.props.isFather) {
-      yadjust = rectHeight1 / 2;
+      yadjust += rectHeight1 / 2;
     } else {
-      yadjust = rectHeight1 + rectHeight2 / 2;
+      yadjust += rectHeight1 + rectHeight2 / 2;
+      lineheight = rectHeight2;
+      linepos += rectHeight1;
     }
-    var ypos = cm.yoffset + yadjust - 7;
-    return <div  style={{position: 'absolute', top: ypos, left: this.props.position - 7, width: 15, height: 15, border: '1px solid black',
+    var lineleft = this.state.position;
+    var ypos = cm.yoffset + yadjust - 8;
+    return <div>
+    <div  style={{position: 'absolute', top: linepos, left: lineleft, width: 1, height: lineheight, backgroundColor: 'black'}} />
+      <div onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp} onMouseMove={this.onMouseMove} onClick={this.onMouseClick}
+      onMouseLeave={this.onMouseLeave}
+      style={{position: 'absolute', top: ypos, left: lineleft - 8, width: 15, height: 15, border: '1px solid black',
     borderRadius: '15px', backgroundColor: 'grey'}} />
+      </div>
   }
 });
 

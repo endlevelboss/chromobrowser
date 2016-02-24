@@ -202,13 +202,33 @@ class DatabaseManager {
     crossoverdata.forEach(function (item) {
       if (item.name == name) {
         item.data.forEach(function (d) {
-          if (d.father == isFather && d.chromosome == c ) {
-            data.push(d);
+          if (d != null) {
+            if (d.father == isFather && d.chromosome == c ) {
+              data.push(d);
+            }
           }
         });
       }
     });
     return data;
+  }
+
+  editCrossover(crossoverItem, newPosition) {
+    crossoverItem.position = newPosition;
+    this.update();
+  }
+
+  deleteCrossover(crossoverItem, name, isFather) {
+    var crossoverdata = this.getUserdataData('crossovers');
+    var persondata = null;
+    crossoverdata.forEach(function (item) {
+      if (item.name == name) {
+        persondata = item;
+      }
+    });
+    var index = persondata.data.indexOf(crossoverItem);
+    persondata.data[index] = null;
+    this.update();
   }
 
   setCrossover(rowid, isFather) {
