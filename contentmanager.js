@@ -30,6 +30,7 @@ class DatabaseManager {
     this.displaymode = 'A'; // Viewselection, defaulting to single user
 
     this.selectedKits = [];
+    this.crossovers = []; // One crossoverlist for each kit
 
 
     this.useParentCheckbox = false;
@@ -42,7 +43,22 @@ class DatabaseManager {
     this.matchdata = []; // stores array of sorted data for display in chromobrowser
     this.currentUsers = []; // stores kits involved in current comparison
     this.comparisons = []; // stores comparisons between kits
+  }
 
+  initialize() {
+    // check if selectedkits is empty, and set default values
+    if (this.selectedKits.length == 0 && this.kits.length > 0) {
+      this.selectedKits[1] = this.kits[0].name;
+      this.selectedKits[2] = this.kits[0].name;
+      this.selectedKits[3] = this.kits[0].name;
+    }
+
+    this.crossovers = this.getUserdataData('crossovers');
+    for (var i = this.crossovers.length - 1; i > -1; i--) {
+      if (this.crossovers[i].delete) {
+        this.crossovers.splice(i, 1);
+      }
+    }
   }
 
   getScale() {
@@ -183,31 +199,24 @@ class DatabaseManager {
 
   addKit(kit) {
     this.kits.push(kit);
-    this.update();
   }
 
   addRawdata(raw) {
     this.kitRawdata.push(raw);
-    this.update();
   }
 
   setMarkerPosition(pos) {
     this.markerPosition = pos;
   }
 
-  getCrossover(name, isFather) {
+  getCrossover2(name) {
     var data = [];
-    var crossoverdata = this.getUserdataData('crossovers');
     var c = this.selectedChromosome;
-    crossoverdata.forEach(function (item) {
-      if (item.name == name) {
-        item.data.forEach(function (d) {
-          if (d != null) {
-            if (d.father == isFather && d.chromosome == c ) {
-              data.push(d);
-            }
-          }
-        });
+    this.crossovers.forEach(function (item) {
+      if (item != null) {
+        if (item.name == name && item.chromosome == c) {
+          data.push(item);
+        }
       }
     });
     return data;
@@ -218,35 +227,15 @@ class DatabaseManager {
     this.update();
   }
 
-  deleteCrossover(crossoverItem, name, isFather) {
-    var crossoverdata = this.getUserdataData('crossovers');
-    var persondata = null;
-    crossoverdata.forEach(function (item) {
-      if (item.name == name) {
-        persondata = item;
-      }
-    });
-    var index = persondata.data.indexOf(crossoverItem);
-    persondata.data[index] = null;
+  deleteCrossover(crossoverItem) {
+    var index = this.crossovers.indexOf(crossoverItem);
+    this.crossovers[index].delete = true;
     this.update();
   }
 
   setCrossover(rowid, isFather) {
-    var kitToModify = this.getKitnameFromRow(rowid);
-    var crossoverdata = this.getUserdataData('crossovers');
-    var kitdata = null;
-    crossoverdata.forEach( function (item) {
-      if (item.name == kitToModify) {
-        kitdata = item.data;
-      }
-    });
-    if (kitdata == null) {
-      kitdata = [];
-      kitdata.push({father: isFather, position: this.markerPosition, chromosome: this.selectedChromosome});
-      crossoverdata.push({name: kitToModify, data: kitdata});
-    } else {
-      kitdata.push({father: isFather, position: this.markerPosition, chromosome: this.selectedChromosome});
-    }
+    var kitOwner = this.getKitnameFromRow(rowid);
+    this.crossovers.push({name: kitOwner, father: isFather, position: this.markerPosition, chromosome: this.selectedChromosome, delete: false});
     this.update();
   }
 
@@ -281,13 +270,6 @@ class DatabaseManager {
   }
 
   update() {
-    // check if selectedkits is empty, and set default values
-    if (this.selectedKits.length == 0 && this.kits.length > 0) {
-      this.selectedKits[1] = this.kits[0].name;
-      this.selectedKits[2] = this.kits[0].name;
-      this.selectedKits[3] = this.kits[0].name;
-    }
-
     this.scale = this.getScale();
 
     this.inCommonWithSelectedMatch = findAllIncommon(this.selectedMatch);

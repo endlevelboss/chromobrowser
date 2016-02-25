@@ -72,7 +72,7 @@ function onStartup() {
             cm.addKit(res.value);
             res.continue();
         } else {
-            cm.update();
+          cm.initialize();
             var transaction = db.transaction(["raw"], "readonly");
             var storeRaw = transaction.objectStore('raw');
             var cursorRaw = storeRaw.openCursor();
@@ -89,7 +89,7 @@ function onStartup() {
 }
 
 window.onbeforeunload = function (e) {
-    saveLocalstorage();
+  saveLocalstorage();
 }
 
 window.addEventListener("resize", function(e) {

@@ -310,20 +310,13 @@ var MatchBlocks = React.createClass({
                        }.bind(this)
           );
         }
+
+        var crossoverlist = cm.getCrossover2(this.props.user.name);
         var crossovers = [];
         if (this.state.useParent) {
-          var cxFather = cm.getCrossover(this.props.user.name, true);
-          var cxMother = cm.getCrossover(this.props.user.name, false);
-          var name = this.props.user.name;
-          cxFather.map(function (item, index) {
-            var cxButton = <CrossoverButton key={index} data={item} name={name} isFather={item.father} position={item.position} list={clist} rows={rows} rownumber={rownumber}/>
-            crossovers.push(cxButton);
-          })
-          cxMother.map(function (item, index) {
-            var cxButton = <CrossoverButton key={index+'m'} data={item} name={name} isFather={item.father} position={item.position} list={clist} rows={rows} rownumber={rownumber}/>
-            crossovers.push(cxButton);
-          })
-          // console.log(this.state.fatherCrossovers);
+          crossovers = crossoverlist.map(function (item, index) {
+            return <CrossoverButton key={index} data={item} list={clist} rows={rows} rownumber={rownumber}/>
+          });
         }
       }
       return (
@@ -342,7 +335,8 @@ var CrossoverButton = React.createClass({
       canvasheight: cm.canvasheight,
       isDragging: false,
       toBeDeleted: false,
-      position: this.props.position,
+      position: this.props.data.position,
+      delete: this.props.data.delete,
     });
   },
   componentDidMount: function () {
@@ -354,6 +348,8 @@ var CrossoverButton = React.createClass({
   update: function () {
     this.setState({
       canvasheight: cm.canvasheight,
+      position: this.props.data.position,
+      delete: this.props.data.delete,
     });
   },
   onMouseDown: function (e) {
@@ -368,10 +364,10 @@ var CrossoverButton = React.createClass({
     this.setState({
       isDragging: false,
     })
-    if (this.state.position != this.props.position) {
+    if (this.state.position != this.props.data.position) {
       cm.editCrossover(this.props.data, this.state.position);
     } else {
-      cm.deleteCrossover(this.props.data, this.props.name, this.props.isFather);
+      cm.deleteCrossover(this.props.data);
     }
   },
   onMouseMove: function (e) {
@@ -387,7 +383,7 @@ var CrossoverButton = React.createClass({
     this.setState({
       isDragging: false,
     })
-    if (this.state.position != this.props.position) {
+    if (this.state.position != this.props.data.position) {
       cm.editCrossover(this.props.data, this.state.position);
     }
   },
@@ -409,7 +405,7 @@ var CrossoverButton = React.createClass({
     var yadjust = (rowheight + cm.comparisonHeight) * this.props.rownumber;
     var lineheight = rectHeight1;
     var linepos = cm.yoffset + (rowheight + cm.comparisonHeight) * this.props.rownumber;
-    if (this.props.isFather) {
+    if (this.props.data.father) {
       yadjust += rectHeight1 / 2;
     } else {
       yadjust += rectHeight1 + rectHeight2 / 2;
@@ -418,13 +414,17 @@ var CrossoverButton = React.createClass({
     }
     var lineleft = this.state.position;
     var ypos = cm.yoffset + yadjust - 8;
-    return <div>
-    <div  style={{position: 'absolute', top: linepos, left: lineleft, width: 1, height: lineheight, backgroundColor: 'black'}} />
-      <div onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp} onMouseMove={this.onMouseMove} onClick={this.onMouseClick}
-      onMouseLeave={this.onMouseLeave}
-      style={{position: 'absolute', top: ypos, left: lineleft - 8, width: 15, height: 15, border: '1px solid black',
-    borderRadius: '15px', backgroundColor: 'grey'}} />
-      </div>
+    if (this.state.delete) {
+      return <div/>
+    } else {
+      return <div>
+      <div  style={{position: 'absolute', top: linepos, left: lineleft, width: 1, height: lineheight, backgroundColor: 'black'}} />
+        <div onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp} onMouseMove={this.onMouseMove} onClick={this.onMouseClick}
+        onMouseLeave={this.onMouseLeave}
+        style={{position: 'absolute', top: ypos, left: lineleft - 8, width: 15, height: 15, border: '1px solid black',
+      borderRadius: '15px', backgroundColor: 'grey'}} />
+        </div>
+    }
   }
 });
 
@@ -772,7 +772,7 @@ var Chromosome = React.createClass({
       while (pos < chromolength[this.props.chromoIndex]) {
         var myleft = cm.xoffset + cm.xinneroffset + pos*this.state.scale;
         var newdiv = <div key={pos} style={{position: 'absolute', top: cm.yoffset-5,
-          left: myleft, height: 5, width: 1, backgroundColor: 'black'}} ></div>
+          left: myleft, height: 5, width: 1, backgroundColor: 'black', userSelect: 'none', MozUserSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none'}} ></div>
         var myid = pos / 1000000;
         var xoffset = -10;
         if (myid === 0) {
@@ -782,7 +782,7 @@ var Chromosome = React.createClass({
           xoffset += 3;
         }
         var newid = <div key={pos} style={{position: 'absolute', top: cm.yoffset - 20,
-          left: myleft + xoffset, color: 'black', fontFamily: '"Arial"', fontSize: 'small'}}>{myid}</div>
+          left: myleft + xoffset, color: 'black', fontFamily: '"Arial"', fontSize: 'small' , userSelect: 'none', MozUserSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none'}}>{myid}</div>
         markers.push(newdiv);
         markerids.push(newid);
         pos += 10000000;

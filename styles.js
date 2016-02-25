@@ -87,6 +87,9 @@ function matchstyle(xpos, ypos, rectHeight, rectWidth, color) {
             fontFamily: '"Arial"',
             fontSize: 'small',
             userSelect: 'none',
+            MozUserSelect: 'none',
+            WebkitUserSelect: 'none',
+            msUserSelect: 'none',
         };
     return matchblockStyle;
 }
@@ -106,6 +109,10 @@ function chromostyle(xpos, ypos, rectHeight, rectWidth, fSize) {
             fontFamily: '"Arial"',
             fontSize: fSize,
             overflow: 'hidden',
+            userSelect: 'none',
+            MozUserSelect: 'none',
+            WebkitUserSelect: 'none',
+            msUserSelect: 'none',
         };
     return chromostyle;
 }
@@ -127,4 +134,3 @@ function overlaystyle(xpos, ypos, rectHeight, rectWidth, fSize, color, textcolor
         };
     return chromostyle;
 }
-    
